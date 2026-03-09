@@ -10,7 +10,7 @@ export class AccountController {
             const result = await accountService.registerFamilyMember({ ...req.body, cognitoSub });
 
             res.status(201).json({
-                sucess: true,
+                success: true,
                 message : 'Register successful',
                 result
             });
@@ -29,13 +29,13 @@ export class AccountController {
             const result = await accountService.getFamilyMemberInfo(cognitoSub);
 
             res.status(200).json({
-                sucess: true,
+                success: true,
                 message : 'Account info retrieval successful',
                 result
             });
         } catch (err) {
             res.status(500).json({
-                sucess: false,
+                success: false,
                 error : err.message
             });
         }
@@ -51,13 +51,13 @@ export class AccountController {
             const result = await accountService.uploadFamilyMemberAccountPic(cognitoSub, file);
 
             res.status(200).json({
-                sucess: true,
+                success: true,
                 message : 'Profile pic upload successful',
                 result
             });
         } catch (err) {
             res.status(500).json({
-                sucess: false,
+                success: false,
                 error : err.message
             });
         }
@@ -70,13 +70,13 @@ export class AccountController {
             const result = await accountService.updateFamilyMemberInfo({ ...req.body, cognitoSub });
 
             res.status(200).json({
-                sucess: true,
+                success: true,
                 message : 'Account info update successful',
                 result
             });
         } catch (err) {
             res.status(500).json({
-                sucess: false,
+                success: false,
                 error : err.message
             });
         }
@@ -90,12 +90,12 @@ export class AccountController {
             await accountService.archiveFamilyMemberAccount(cognitoSub, username);
 
             res.status(200).json({
-                sucess: true,
+                success: true,
                 message : 'Account archive successful',
             });
         } catch (err) {
             res.status(500).json({
-                sucess: false,
+                success: false,
                 error : err.message
             });
         }
