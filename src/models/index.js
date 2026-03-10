@@ -4,3 +4,5 @@ import './personWithVisualImpairmentModel.js';
 import './iotWearableModel.js';
 import './activeIoTWearableModel.js';
 import './familyPviLinkModel.js';
+import './notificationTypeModel.js';
+import './notificationModel.js';
