@@ -1,14 +1,14 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/db.js";
 
-export const NotificationType = sequelize.define(
+export const Notification = sequelize.define(
     'Notification',
     {
-        ntf_linked_user_id: {
+        ntf_linked_pvi_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references : {
-                model : 'family_members',
+                model : 'persons_with_visual_impairment',
                 key : 'id',
             },
         },
@@ -30,7 +30,8 @@ export const NotificationType = sequelize.define(
         },
         ntf_is_read: {
             type: DataTypes.BOOLEAN,
-            allowNull: false
+            allowNull: false,
+            defaultValue: false
         }
     },
     {
