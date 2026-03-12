@@ -5,7 +5,7 @@ export class ActiveIoTWearableService {
         const activeIoTWearable = await ActiveIoTWearable.create({
             act_linked_wearable_id : iotWearableId,
             act_linked_pvi_id      : pviId,
-        }, options);
+        }, { ...options });
 
         return activeIoTWearable;
     };
@@ -17,6 +17,6 @@ export class ActiveIoTWearableService {
     };
 
     async softDeleteActiveIoT(pviId, options = {}) {
-        await ActiveIoTWearable.destroy({ where : { act_linked_pvi_id : pviId } }, options);
+        await ActiveIoTWearable.destroy({ where : { act_linked_pvi_id : pviId }, ...options });
     }
 }

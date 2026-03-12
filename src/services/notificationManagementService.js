@@ -18,6 +18,7 @@ export class NotificationManagementService {
             throw new Error('User not found');
         }
 
+        // Finds all pvi linked to user
         const linkedPvis = await userPviLinkService.findByFamId(user.id);
 
         let notifications = [];
@@ -25,8 +26,10 @@ export class NotificationManagementService {
         for (let i = 0; i < linkedPvis.length; i++) {
             const linkedPvi = linkedPvis[i];
 
+            // Finds data of the current pvi  
             const pvi = await pviService.findByPviId(linkedPvi.relative_linked_pvi_id);
 
+            // Finds all notifications connected to the current pvi
             const pviNotifications = await notificationService.getNotifications(linkedPvi.relative_linked_pvi_id);
 
             let notificationType = "";
@@ -34,6 +37,7 @@ export class NotificationManagementService {
             for (let j = 0; j < pviNotifications.length; j++) {
                 const pviNotification = pviNotifications[j];
 
+                // Retrieves notification details like title and description given notification_type id
                 notificationType = await notificationTypeService.findNotificationTypeById(pviNotification.ntf_linked_notification_type_id);
 
                 notifications.push({

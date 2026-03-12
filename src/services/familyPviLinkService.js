@@ -8,33 +8,44 @@ export class FamilyPviLinkService {
     };
 
     async setLink(familyMemberId, pviId, relationship, options = {}) { 
-        const family_pvi_link = await FamilyPviLink.create({
+        const familyPviLink = await FamilyPviLink.create({
             relative_linked_fam_id : familyMemberId,
             relative_linked_pvi_id : pviId,
             relative_relationship  : relationship
-        }, options);
+        }, { ...options });
        
-        return family_pvi_link.id;
+        return familyPviLink.id;
     };
 
     async updateRelationship(familyMemberId, pviId, newPviData, options = {}) {
-        const family_pvi_link = await FamilyPviLink.findOne({ 
+        const familyPviLink = await FamilyPviLink.findOne({ 
             where: { 
                 relative_linked_fam_id : familyMemberId, 
                 relative_linked_pvi_id : pviId 
             } 
         });
 
-        console.log('Service: updateRelationship found link:', family_pvi_link ? family_pvi_link.id : 'null');
+        console.log('Service: updateRelationship found link:', familyPviLink ? familyPviLink.id : 'null');
 
-        await family_pvi_link.update({ 
+        await familyPviLink.update({ 
             relative_relationship : newPviData.relationship
-        }, options);
+        }, { ...options });
 
-        return family_pvi_link;
+        return familyPviLink;
     };
 
-    async softDeleteFamilyPviLink(familyMemberId, options = {}) {
-        await FamilyPviLink.destroy({ where: { relative_linked_fam_id: familyMemberId } }, options);
+    async softDeleteFamilyPviLink(familyMemberId, pviId, options = {}) {
+        const familyPviLink = await FamilyPviLink.findOne({ 
+            where: { 
+                relative_linked_fam_id : familyMemberId, 
+                relative_linked_pvi_id : pviId 
+            },
+        });
+
+        if (!familyPviLink) {
+            throw new Error('No link found to PVI');
+        }
+
+        await familyPviLink.destroy({ ...options });
     };
 }

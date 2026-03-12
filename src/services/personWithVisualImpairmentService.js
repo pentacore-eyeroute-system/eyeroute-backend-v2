@@ -22,13 +22,13 @@ export class PersonWithVisualImpairmentService {
             pvi_first_name  : data.pviFirstname,
             pvi_last_name   : data.pviLastname,
             pvi_gender      : data.pviGender,
-        }, options);
+        }, { ...options });
 
         return pvi.id;
     };
 
     async findByPviPublicId(publicId) {
-        const pvi = await PVI.findOne({ where: { pvi_public_id : publicId }, limit: 1 });
+        const pvi = await PVI.findOne({ where: { pvi_public_id : publicId }});
 
         if (!pvi) return null;
         
@@ -43,20 +43,20 @@ export class PersonWithVisualImpairmentService {
 
 
     async updatePviInfo(id, newPviData, options = {}) {
-        const pvi = await PVI.findOne({ where: { id: id } });
+        const pvi = await PVI.findByPk(id);
         console.log('Service: updatePviInfo found pvi:', pvi ? pvi.id : 'null');
 
         await pvi.update({ 
             pvi_first_name  : newPviData.firstname,
             pvi_last_name   : newPviData.lastname,
             pvi_gender      : newPviData.gender,
-        }, options);
+        }, { ...options });
 
         return pvi;
     };
 
     async softDeletePvi(pviId, options = {}) {
-        const deletedPviCount = await PVI.destroy({ where: { id : pviId } }, options);
+        const deletedPviCount = await PVI.destroy({ where: { id : pviId }, ...options });
 
         if (deletedPviCount === 0) {
             throw new Error('PVI not found');

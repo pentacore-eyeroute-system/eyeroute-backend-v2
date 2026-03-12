@@ -14,7 +14,7 @@ export class IoTWearableService {
 
         await iotWearable.update({
             wearable_activated_at : new Date(),
-        }, options);
+        }, { ...options });
 
         return iotWearable;
     };
