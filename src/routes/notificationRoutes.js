@@ -9,5 +9,6 @@ const notificationController = new NotificationController();
 router.get('/get-notifications', authenticateCognitoToken, notificationController.getNotificationsByUser);
 
 // UPDATE route
+router.put('/update-notification-status/:id', authenticateCognitoToken, notificationController.updateNotificationIsReadStatus);
 
 export default router;

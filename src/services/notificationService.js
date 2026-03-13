@@ -6,4 +6,18 @@ export class NotificationService {
 
         return notifications;
     };
+
+    async updateIsReadStatus(ntfId) {
+        const notification = await Notification.findByPk(ntfId);
+        
+        if (!notification) {
+            throw new Error('Notification not found');
+        }
+
+        notification.update({
+            ntf_is_read: true
+        });
+
+        return notification;
+    };
 }

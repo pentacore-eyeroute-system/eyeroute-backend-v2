@@ -41,6 +41,7 @@ export class NotificationManagementService {
                 notificationType = await notificationTypeService.findNotificationTypeById(pviNotification.ntf_linked_notification_type_id);
 
                 notifications.push({
+                    id                       : pviNotification.id,
                     pvi_first_name           : pvi.pvi_first_name, // use pvi first name to know which notification belongs to whom
                     notification_title       : notificationType.ntt_title,
                     notification_description : notificationType.ntt_description,
@@ -50,5 +51,13 @@ export class NotificationManagementService {
         }
 
         return notifications;
+    };
+
+    async updateNotificationIsReadStatus(ntfId) {
+        
+
+        const updatedNotification = await notificationService.updateIsReadStatus(ntfId);
+
+        return updatedNotification;
     };
 }

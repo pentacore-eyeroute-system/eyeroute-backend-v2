@@ -23,4 +23,23 @@ export class NotificationController {
             });
         }
     };
+
+    updateNotificationIsReadStatus = async (req, res) => {
+        try {
+            const ntfId = req.params.id;
+
+            const result = await notificationManagementService.updateNotificationIsReadStatus(ntfId);
+
+            res.status(200).json({
+                success: true,
+                message: 'Notification read status update success',
+                result
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            })
+        }
+    };
 }
