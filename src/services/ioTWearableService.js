@@ -7,6 +7,12 @@ export class IoTWearableService {
         return iotWearable;
     };
 
+    async findIotById(iotId) {
+        const iotWearable = await IoTWearable.findByPk(iotId);
+
+        return iotWearable;
+    };
+
     async verifyActivationCode(iotWearable, inputIotActivationCode, options = {}) {
         if (iotWearable.wearable_activation_code !== inputIotActivationCode) {
             throw new Error('Invalid device activation code');

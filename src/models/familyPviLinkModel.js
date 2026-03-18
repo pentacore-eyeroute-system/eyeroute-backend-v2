@@ -31,11 +31,5 @@ export const FamilyPviLink = sequelize.define(
         tableName: 'family_pvi_links',
         timestamps: true,
         paranoid: true,
-        indexes: [
-            {
-                unique: true,
-                fields: ['relative_linked_fam_id', 'relative_linked_pvi_id'],
-            }
-        ],
     }
 );

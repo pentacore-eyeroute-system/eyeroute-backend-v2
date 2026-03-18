@@ -97,24 +97,33 @@ export class PviManagementService {
             throw new Error('User not found');
         }
 
+        // Finds all pvi linked to user
         const linkedPvis = await familyPviLinkService.findByFamId(familyMember.id);
 
         let pvisAndRelationship = [];
 
         for (let i = 0; i < linkedPvis.length; i++) {
-            const pvi = await pviService.findByPviId(linkedPvis[i].relative_linked_pvi_id);
+            const pvi = await pviService.findByPviId(linkedPvis[i].relative_linked_pvi_id); // Returns single pvi info
             const relationship = linkedPvis[i].relative_relationship;
 
             if (!relationship) {
                 throw new Error("Relationship is required");
             }
+
+            // Finds active iot linked to PVI
+            const activeIoTWearable = await activeIoTWearableService.findByPviId(pvi.id);
+
+            // Finds iot info from the active iot
+            const iotWearable = await iotWearableService.findIotById(activeIoTWearable.act_linked_wearable_id);
             
             pvisAndRelationship.push({
                 id              : pvi.id,
                 publicPviId     : pvi.pvi_public_id,
                 firstName       : pvi.pvi_first_name,
                 lastName        : pvi.pvi_last_name,
-                relationship    : relationship
+                relationship    : relationship,
+                iotId           : iotWearable.id,
+                iotSerialNumber : iotWearable.wearable_serial_number,
             });
         };
 

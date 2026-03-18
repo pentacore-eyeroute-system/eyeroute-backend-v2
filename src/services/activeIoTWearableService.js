@@ -16,6 +16,12 @@ export class ActiveIoTWearableService {
         return activeIoTWearable;
     };
 
+    async findByPviId(pviId) {
+        const activeIoTWearable = await ActiveIoTWearable.findOne({ where : { act_linked_pvi_id : pviId } });
+
+        return activeIoTWearable;
+    };
+
     async softDeleteActiveIoT(pviId, options = {}) {
         await ActiveIoTWearable.destroy({ where : { act_linked_pvi_id : pviId }, ...options });
     }
