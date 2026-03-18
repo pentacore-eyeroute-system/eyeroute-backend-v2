@@ -18,15 +18,12 @@ export class PviManagementService {
 
         try {
             const familyMember = await familyMemberService.getFamilyMember(cognitoSub);
-            const familyMemberId = familyMember.id;
 
             if (!familyMember) {
                 throw new Error('User not found');
             }
 
-            const newPviPublicId = await pviService.generatePviPublicId();
-
-            const pviId = await pviService.createPvi(pviData, newPviPublicId, { transaction });
+            const familyMemberId = familyMember.id;
 
             // Verifies the device serial number from client against table
             const iotWearable = await iotWearableService.findIotBySerialNumber(iotData.inputIoTSerialNumber);
@@ -35,15 +32,20 @@ export class PviManagementService {
                 throw new Error('Device not found');
             };
 
-            // Verifies the user input activation code against table. If it matches, updates activated at timestamp
-            await iotWearableService.verifyActivationCode(iotWearable, iotData.inputIoTActivationCode, { transaction });
-
             // Checks if iot is already owned by existing pvi
             const iotIsAlreadyOwned = await activeIoTWearableService.findByWearableId(iotWearable.id);
 
             if (iotIsAlreadyOwned) {
                 throw new Error('Device is already assigned to another PVI');
             }
+
+            // Verifies the user input activation code against table. If it matches, updates activated at timestamp
+            await iotWearableService.verifyActivationCode(iotWearable, iotData.inputIoTActivationCode, { transaction });
+
+            const newPviPublicId = await pviService.generatePviPublicId();
+            
+            // Creates PVI record
+            const pviId = await pviService.createPvi(pviData, newPviPublicId, { transaction });
 
             // Adds verified iot to active iot table
             await activeIoTWearableService.addActiveIoT(iotWearable.id, pviId, { transaction });
@@ -54,10 +56,17 @@ export class PviManagementService {
             await transaction.commit();
 
             return { 
-                familyMemberId : familyMemberId,
-                pviId          : pviId,
-                activeIotId    : iotWearable.id,
-                linkId         : linkId,
+                familyMemberId  : familyMemberId,
+                pvi             : {
+                    id          : pviId,
+                    pviPublicId : newPviPublicId,
+                    firstName   : pviData.pviFirstname,
+                    lastName    : pviData.pviLastname,
+                    gender      : pviData.pviGender
+                },
+                relationship    : relationship,
+                iotWearableId   : iotWearable.id,
+                linkId          : linkId,
             }; 
         } catch (err) {
             await transaction.rollback(); // Rollback everything if any step fails
@@ -67,11 +76,12 @@ export class PviManagementService {
 
     async linkUserToExistingPvi(cognitoSub, pviPublicId, relationship) {
         const familyMember = await familyMemberService.getFamilyMember(cognitoSub);
-        const familyMemberId = familyMember.id;
 
         if (!familyMember) {
             throw new Error('User not found');
         }
+
+        const familyMemberId = familyMember.id;
        
         const pvi = await pviService.findByPviPublicId(pviPublicId);
 
@@ -124,6 +134,7 @@ export class PviManagementService {
                 relationship    : relationship,
                 iotId           : iotWearable.id,
                 iotSerialNumber : iotWearable.wearable_serial_number,
+                iotActivationCode : iotWearable.wearable_activation_code,
             });
         };
 
