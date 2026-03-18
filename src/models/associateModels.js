@@ -4,6 +4,7 @@ import { PVI } from "./personWithVisualImpairmentModel.js";
 import { IoTWearable } from "./iotWearableModel.js";
 import { ActiveIoTWearable } from "./activeIoTWearableModel.js";
 import { Notification } from "./notificationModel.js";
+import { Location } from "./locationModel.js";
 
 FamilyMember.hasMany(FamilyPviLink, {
     foreignKey: 'relative_linked_fam_id',
@@ -43,4 +44,12 @@ PVI.hasMany(Notification, {
 
 Notification.belongsTo(PVI, {
     foreignKey : 'ntf_linked_pvi_id',
+});
+
+ActiveIoTWearable.hasMany(Location, {
+    foreignKey : 'loc_linked_active_wearable_id'
+});
+
+Location.belongsTo(ActiveIoTWearable, {
+    foreignKey : 'loc_linked_active_wearable_id'
 });
