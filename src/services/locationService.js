@@ -7,6 +7,11 @@ export class LocationService {
             order : [['loc_recorded_at', 'DESC']]  
         });
 
-        return location;
+        return {
+            id : location.id,
+            loc_latitude : location.loc_latitude,
+            loc_longitude : location.loc_longitude,
+            loc_last_seen_at : location.loc_recorded_at,
+        };
     };
 }
