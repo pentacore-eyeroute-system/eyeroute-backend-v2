@@ -18,9 +18,11 @@ export class PviManagementService {
 
         try {
             const familyMember = await familyMemberService.getFamilyMember(cognitoSub);
+
             if (!familyMember) {
                 throw new Error('User not found');
             }
+
             const familyMemberId = familyMember.id;
 
             // Verifies the device serial number from client against table
@@ -54,11 +56,17 @@ export class PviManagementService {
             await transaction.commit();
 
             return { 
-                familyMemberId : familyMemberId,
-                pviId          : pviId,
-                pviPublicId    : newPviPublicId,
-                activeIotId    : iotWearable.id,
-                linkId         : linkId,
+                familyMemberId  : familyMemberId,
+                pvi             : {
+                    id          : pviId,
+                    pviPublicId : newPviPublicId,
+                    firstName   : pviData.pviFirstname,
+                    lastName    : pviData.pviLastname,
+                    gender      : pviData.pviGender
+                },
+                relationship    : relationship,
+                iotWearableId   : iotWearable.id,
+                linkId          : linkId,
             }; 
         } catch (err) {
             await transaction.rollback(); // Rollback everything if any step fails
@@ -123,8 +131,10 @@ export class PviManagementService {
                 publicPviId     : pvi.pvi_public_id,
                 firstName       : pvi.pvi_first_name,
                 lastName        : pvi.pvi_last_name,
-                gender          : pvi.pvi_gender,
-                relationship    : relationship
+                relationship    : relationship,
+                iotId           : iotWearable.id,
+                iotSerialNumber : iotWearable.wearable_serial_number,
+                iotActivationCode : iotWearable.wearable_activation_code,
             });
         };
 
