@@ -131,6 +131,7 @@ export class PviManagementService {
                 publicPviId     : pvi.pvi_public_id,
                 firstName       : pvi.pvi_first_name,
                 lastName        : pvi.pvi_last_name,
+                gender          : pvi.pvi_gender, //in-add q bebe kasi wala i2 sa code mo hehe kaya inde ko ma-edit gender
                 relationship    : relationship,
                 iotId           : iotWearable.id,
                 iotSerialNumber : iotWearable.wearable_serial_number,
