@@ -27,9 +27,9 @@ export const ActiveIoTWearable = sequelize.define(
       defaultValue: null, // Unknown until first telemetry
     },
     act_status: {
-      type: DataTypes.ENUM('offline', 'online'),
+      type: DataTypes.ENUM('Offline', 'Online'),
       allowNull: false,
-      defaultValue: 'offline',
+      defaultValue: 'Offline',
     },
   },
   {
