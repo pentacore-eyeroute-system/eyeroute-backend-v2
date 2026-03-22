@@ -12,9 +12,9 @@ export class AccountService {
     async registerFamilyMember(famData) {
         const familyMemberId = await familyMemberService.createFamilyMember(famData);
 
-        return {
-            id : familyMemberId
-        };
+            return {
+                id : familyMemberId
+            };
     };
 
     async getFamilyMemberAccountPic(id) {
