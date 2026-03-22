@@ -27,7 +27,7 @@ export class PviController {
             });
         } catch (err) {
             res.status(500).json({
-                sucess: false,
+                success: false,
                 error : err.message
             });
         }
@@ -37,19 +37,19 @@ export class PviController {
     linkUserToExistingPvi = async (req, res) => {
         try {
             const cognitoSub = req.user.sub;
-            const pviPublicId = req.body.pviPublicId;
+            const pviId = req.body.pviId;
             const relationship = req.body.relationship;
             
-            const result = await pviManagementService.linkUserToExistingPvi(cognitoSub, pviPublicId, relationship);
+            const result = await pviManagementService.linkUserToExistingPvi(cognitoSub, pviId, relationship);
 
             res.status(201).json({
-                sucess: true,
+                success: true,
                 message : 'Pvi add link successful',
                 result
             });
         } catch (err) {
             res.status(500).json({
-                sucess: false,
+                success: false,
                 error : err.message
             });
         }
@@ -62,13 +62,33 @@ export class PviController {
             const result = await pviManagementService.getPvisInfo(cognitoSub);
 
             res.status(200).json({
-                sucess: true,
+                success: true,
                 message : 'Pvis info retrieval successful',
                 result
             });
         } catch (err) {
             res.status(500).json({
-                sucess: false,
+                success: false,
+                error : err.message
+            });
+        }
+    };
+
+    // Searches pvi
+    findPviByPviPublicId = async (req, res) => {
+        try {
+            const pviPublicId = req.body.pviPublicId;          
+            
+            const result = await pviManagementService.findPviByPviPublicId(pviPublicId);
+
+            res.status(200).json({
+                success: true,
+                message : 'Pvi info retrieval successful',
+                result
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
                 error : err.message
             });
         }
@@ -87,13 +107,13 @@ export class PviController {
             const result = await pviManagementService.updatePviInfoAndRelationship(cognitoSub, pviId, { ...req.body });
 
             res.status(200).json({
-                sucess: true,
+                success: true,
                 message : 'Pvi info update successful',
                 result
             });
         } catch (err) {
             res.status(500).json({
-                sucess: false,
+                success: false,
                 error : err.message
             });   
         }
@@ -108,13 +128,13 @@ export class PviController {
             const result = await pviManagementService.archivePviAndActiveIoT(cognitoSub, pviId);
 
             res.status(200).json({
-                sucess: true,
+                success: true,
                 message : 'Pvi archive successful',
                 result
             });
         } catch (err) { 
             res.status(500).json({
-                sucess: false,
+                success: false,
                 error : err.message
             });    
         }

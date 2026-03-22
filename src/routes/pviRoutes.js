@@ -11,6 +11,7 @@ router.post('/link-pvi', authenticateCognitoToken, pviController.linkUserToExist
 
 // GET route
 router.get('/get-linked-apvis-info', authenticateCognitoToken, pviController.getPvisInfo);
+router.get('/find-pvi', authenticateCognitoToken, pviController.findPviByPviPublicId);
 
 // PUT route
 router.put('/update-pvi-info/:id', authenticateCognitoToken, pviController.updatePviInfoAndRelationship);

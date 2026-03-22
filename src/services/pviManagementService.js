@@ -74,7 +74,7 @@ export class PviManagementService {
         }
     };
 
-    async linkUserToExistingPvi(cognitoSub, pviPublicId, relationship) {
+    async linkUserToExistingPvi(cognitoSub, pviId, relationship) {
         const familyMember = await familyMemberService.getFamilyMember(cognitoSub);
 
         if (!familyMember) {
@@ -83,14 +83,6 @@ export class PviManagementService {
 
         const familyMemberId = familyMember.id;
        
-        const pvi = await pviService.findByPviPublicId(pviPublicId);
-
-        if (!pvi) {
-            throw new Error("PVI not found");
-        }
-
-        const pviId = pvi.id;
-
         const linkId = await familyPviLinkService.setLink(familyMemberId, pviId, relationship);
 
         return { 
@@ -131,6 +123,7 @@ export class PviManagementService {
                 publicPviId     : pvi.pvi_public_id,
                 firstName       : pvi.pvi_first_name,
                 lastName        : pvi.pvi_last_name,
+                gender          : pvi.pvi_gender,
                 relationship    : relationship,
                 iotId           : iotWearable.id,
                 iotSerialNumber : iotWearable.wearable_serial_number,
@@ -139,6 +132,16 @@ export class PviManagementService {
         };
 
         return pvisAndRelationship;
+    };
+
+    async findPviByPviPublicId(pviPublicId) {
+        const pvi = await pviService.findByPviPublicId(pviPublicId);
+
+        if (!pvi) {
+            throw new Error("PVI not found");
+        }
+
+        return pvi;
     };
 
     async updatePviInfoAndRelationship(cognitoSub, pviId, newPviData) {
