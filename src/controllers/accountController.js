@@ -45,10 +45,25 @@ export class AccountController {
         try {
             const cognitoSub = req.user.sub;
             const file = req.file;
+            // for debugging
+            console.log('DEBUG: uploadFamilyMemberAccountPic called');
+            console.log('DEBUG: cognitoSub:', cognitoSub);
+            console.log('DEBUG: file received:', file ? {
+                fieldname: file.fieldname,
+                originalname: file.originalname,
+                mimetype: file.mimetype,
+                size: file.size
+            } : 'null');
 
-            if (!file) return res.status(400).json({ error: 'No file uploaded' });
+            if (!file) {
+                console.log('DEBUG: No file found in request');
+                return res.status(400).json({ error: 'No file uploaded' });
+            }
 
             const result = await accountService.uploadFamilyMemberAccountPic(cognitoSub, file);
+            //for debugging
+
+            console.log('DEBUG: upload successful, result:', result);
 
             res.status(200).json({
                 success: true,
@@ -56,6 +71,8 @@ export class AccountController {
                 result
             });
         } catch (err) {
+            //for debugging
+            console.error('DEBUG: upload error:', err);
             res.status(500).json({
                 success: false,
                 error : err.message

@@ -5,27 +5,35 @@ const pviManagementService = new PviManagementService();
 export class PviController {
     // Controller for adding new pvi and linking user to pvi
     createPviAndLinkUser = async (req, res) => {
-        const cognitoSub    = req.user.sub;
-        const pviData       = {
-                                pviFirstname : req.body.pviFirstname,
-                                pviLastname  : req.body.pviLastname,
-                                pviGender    : req.body.pviGender,
-                            };
-        const iotData       = {
-                                inputIoTSerialNumber   : req.body.deviceSerialNumber,
-                                inputIoTActivationCode : req.body.deviceActivationCode,
-                            };
-        const relationship  = req.body.relationship;
-
-        const result = await pviManagementService.createPviAndLinkUser(cognitoSub, pviData, iotData, relationship);
-
         try {
+            const cognitoSub    = req.user.sub;
+            const pviData       = {
+                pviFirstname : req.body.pviFirstname,
+                pviLastname  : req.body.pviLastname,
+                pviGender    : req.body.pviGender,
+            };
+            const iotData       = {
+                inputIoTSerialNumber   : req.body.deviceSerialNumber,
+                inputIoTActivationCode : req.body.deviceActivationCode,
+            };
+            const relationship  = req.body.relationship;
+            //debugging
+            console.log('DEBUG: createPviAndLinkUser called');
+            console.log('DEBUG: cognitoSub:', cognitoSub);
+            console.log('DEBUG: iotData:', iotData);
+
+            const result = await pviManagementService.createPviAndLinkUser(cognitoSub, pviData, iotData, relationship);
+            //debugging
+            console.log('DEBUG: PVI creation successful, result:', result);
+
             return res.status(201).json({
                 success : true,
                 message : 'Pvi register successful',
                 result
             });
         } catch (err) {
+            //debugging
+            console.error('DEBUG: PVI creation error:', err);
             res.status(500).json({
                 success: false,
                 error : err.message

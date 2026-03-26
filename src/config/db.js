@@ -23,7 +23,7 @@ export async function startDbConnection() {
         await sequelize.authenticate();
         console.log('Database connection successful');
 
-        await sequelize.sync({ alter: true });
+        await sequelize.sync({ alter: false });
     } catch (err) {
         console.log(`Database connection error: ${err}`);
         process.exit(1);
