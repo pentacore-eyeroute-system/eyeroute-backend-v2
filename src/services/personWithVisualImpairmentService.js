@@ -13,7 +13,7 @@ export class PersonWithVisualImpairmentService {
         const lastPviId = parseInt(lastPviJson.id);
         const nextPviId = lastPviId + 1;
 
-        return nextPviId.toString().padStart(6, "0");
+        return nextPviId.toString().padStart(7, "0");
     };
 
     async createPvi(data, publicId, options = {}) {
