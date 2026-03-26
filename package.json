@@ -32,12 +32,14 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "http": "^0.0.1-security",
     "multer": "^2.0.2",
     "mysql2": "^3.16.1",
     "nodemailer": "^7.0.13",
     "nodemailer-otp": "^1.0.8",
     "sequelize": "^6.37.7",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "ws": "^8.20.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
