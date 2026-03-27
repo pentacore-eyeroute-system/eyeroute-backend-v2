@@ -22,6 +22,15 @@ export class ActiveIoTWearableService {
         return activeIoTWearable;
     };
 
+    async updateBatteryLevelAndStatus(iotWearableId, activeIotData,) {
+        const activeIoTWearable = await ActiveIoTWearable.findOne({ where: { act_linked_wearable_id : iotWearableId } });
+
+        activeIoTWearable.update({
+            act_battery_level : activeIotData.batteryLevel,
+            act_status : activeIotData.status,
+        });
+    };    
+
     async softDeleteActiveIoT(pviId, options = {}) {
         await ActiveIoTWearable.destroy({ where : { act_linked_pvi_id : pviId }, ...options });
     }
