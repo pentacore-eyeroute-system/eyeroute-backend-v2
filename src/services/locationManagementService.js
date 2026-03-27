@@ -27,12 +27,12 @@ export class LocationManagementService {
         await locationService.pushLatestLocation(activeWearable.id, latestCoordinates);
 
         // Sends latest coordinates to location websocket for real-time updates
-        const ws = getLocationWebSocket();
+        const locationWS = getLocationWebSocket();
 
-        if (ws) {
+        if (locationWS) {
             ws.broadcastLocation(latestCoordinates, iotWearable.id);
         } else {
-            console.log('WebSocket not initialized');
+            console.error('WebSocket not initialized');
         }
     };
 

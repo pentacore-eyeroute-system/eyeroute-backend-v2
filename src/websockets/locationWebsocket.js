@@ -15,14 +15,14 @@ export class LocationWebSocket {
                     const data = JSON.parse(message);
 
                     if (!data.iotWearableId) {
-                        console.log('iotWearableId missing in message');
+                        console.error('iotWearableId missing in message');
                         return;
                     }
 
                     ws.iotWearableId = data.iotWearableId;
                     console.log('Subscribed to iot wearable id:', ws.iotWearableId);
                 } catch (err) {
-                    console.log('Location WebSocket Error:', err.message);
+                    console.error('Location WebSocket Error:', err.message);
                 }
             });
 
