@@ -26,11 +26,19 @@ export class PviManagementService {
             const familyMemberId = familyMember.id;
 
             // Verifies the device serial number from client against table
+
+            //for debugging
+            console.log('DEBUG: Searching for serial number:', iotData.inputIoTSerialNumber);
             const iotWearable = await iotWearableService.findIotBySerialNumber(iotData.inputIoTSerialNumber);
 
             if (!iotWearable) {
+                 //for debugging
+                console.log('DEBUG: Device not found for serial number:', iotData.inputIoTSerialNumber);
                 throw new Error('Device not found');
             };
+
+            //for debugging
+            console.log('DEBUG: Device found:', iotWearable.id);
 
             // Checks if iot is already owned by existing pvi
             const iotIsAlreadyOwned = await activeIoTWearableService.findByWearableId(iotWearable.id);

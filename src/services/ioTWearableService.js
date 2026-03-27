@@ -14,7 +14,14 @@ export class IoTWearableService {
     };
 
     async verifyActivationCode(iotWearable, inputIotActivationCode, options = {}) {
-        if (iotWearable.wearable_activation_code !== inputIotActivationCode) {
+        console.log('DEBUG: Verifying activation code:', {
+            dbCode: iotWearable.wearable_activation_code,
+            dbType: typeof iotWearable.wearable_activation_code,
+            inputCode: inputIotActivationCode,
+            inputType: typeof inputIotActivationCode
+        });
+
+        if (iotWearable.wearable_activation_code != inputIotActivationCode) { // Using != to allow type conversion if needed
             throw new Error('Invalid device activation code');
         }
 
