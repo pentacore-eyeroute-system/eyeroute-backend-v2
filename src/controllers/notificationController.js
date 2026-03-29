@@ -3,6 +3,28 @@ import { NotificationManagementService } from "../services/notificationManagemen
 const notificationManagementService = new NotificationManagementService;
 
 export class NotificationController {
+    recordNewNotification = async (req, res) => {
+        try {
+            const iotSerialNumber = req.params.serialNumber;
+            const iotWearableData = {
+                batteryLevel : req.body.batteryLevel,
+                status : req.body.status,
+            };
+
+            const result = await notificationManagementService.recordNewNotification(iotSerialNumber, iotWearableData);
+
+            res.status(201).json({
+                success: true,
+                message: 'Notification store success',
+            });
+        } catch (err) {
+            res.status(500).json({
+                sucess: false,
+                error : err.message
+            });
+        }
+    };
+
     getNotificationsByUser = async (req, res) => {
         try {
             const cognitoSub = req.user.sub;
