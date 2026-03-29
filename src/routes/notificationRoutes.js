@@ -12,6 +12,6 @@ router.post('/record-notification/:serialNumber', authenticateCognitoToken, noti
 router.get('/get-notifications', authenticateCognitoToken, notificationController.getNotificationsByUser);
 
 // PUT route
-router.put('/update-notification-status/:id', authenticateCognitoToken, notificationController.updateNotificationIsReadStatus);
+router.put('/update-notification-status/:id', authenticateCognitoToken, notificationController.updateNotificationIsReadStatus); // id points to notification id
 
 export default router;
