@@ -30,7 +30,7 @@ export class LocationManagementService {
         const locationWS = getLocationWebSocket();
 
         if (locationWS) {
-            ws.broadcastLocation(latestCoordinates, iotWearable.id);
+            locationWS.broadcastLocation(latestCoordinates, iotWearable.id);
         } else {
             console.error('WebSocket not initialized');
         }

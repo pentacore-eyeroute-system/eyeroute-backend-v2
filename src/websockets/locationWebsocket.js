@@ -36,7 +36,7 @@ export class LocationWebSocket {
         const result = {
             loc_latitude : latestCoordinates.latitude,
             loc_longitude : latestCoordinates.longitude,
-            loc_last_seen_at : latestCoordinates.timestamp,                    
+            loc_recorded_at : latestCoordinates.timestamp,                    
         };
 
         const latestLocation = JSON.stringify({
