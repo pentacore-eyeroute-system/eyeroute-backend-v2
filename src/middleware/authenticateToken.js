@@ -14,7 +14,7 @@ export async function authenticateCognitoToken(req, res, next) {
     try {       
         const authorizationHeader = req.headers.authorization;
 
-        if (!authorizationHeader) return res.status(401).json({ message: 'Missing token' });
+        if (!authorizationHeader) return res.status(401).json({ message: 'Missing authorization header' });
 
         const token = authorizationHeader.split(' ')[1];
         
@@ -25,7 +25,7 @@ export async function authenticateCognitoToken(req, res, next) {
         next();
     } catch (err) {
         console.error('JWT Verification Failed:', err); 
-        return res.status(401).json({ message: 'Invalid or expired token', error: err.message });
+        return res.status(401).json({ message: 'Invalid or expired token' });
     }
 };
 
