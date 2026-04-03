@@ -26,5 +26,8 @@ export default {
     email: {
         emailAddress: process.env.EYEROUTE_EMAIL_ADDRESS,
         emailPassword: process.env.EYEROUTE_EMAIL_PASSWORD,
-    }
+    },
+    iot: {
+        xApiKey: process.env.IOT_X_API_KEY,
+    },
 }
