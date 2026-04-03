@@ -5,6 +5,7 @@ import pviRoutes from './routes/pviRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import locationRoutes from './routes/locationRoutes.js';
 import iotStateRoutes from './routes/iotStateRoutes.js';
+import streamRoutes from './routes/streamRoutes.js';
 import './models/index.js';  // Imports all models
 
 const app = express();
@@ -18,5 +19,6 @@ app.use('/api/pvi', pviRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/location', locationRoutes);
 app.use('/api/iot', iotStateRoutes);
+app.use('/api/stream', streamRoutes);
 
 export default app;
