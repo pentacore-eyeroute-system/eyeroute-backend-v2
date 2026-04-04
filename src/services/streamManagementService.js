@@ -28,4 +28,18 @@ export class StreamManagementService {
 
         await streamService.upsertStream(activeWearable.id, streamUrl);
     };
+
+    async getStreamUrl(pviId) {
+        // Finds active wearable linked to PVI
+        const activeIoTWearable = await activeWearableService.findByPviId(pviId);
+
+        if (!activeIoTWearable) {
+            throw new Error('Device not found')
+        }
+
+        // Retrieves stream record associated to active wearable id
+        const stream = await streamService.getStream(activeIoTWearable.id);
+
+        return stream;
+    };
 }

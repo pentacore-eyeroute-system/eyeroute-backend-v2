@@ -20,5 +20,24 @@ export class StreamController {
                 error : err.message,
             });
         }
-    }
+    };
+
+    getStreamUrl = async (req, res) => {
+        try {
+            const pviId = req.params.id;
+
+            const result = await streamManagementService.getStreamUrl(pviId);
+
+            res.status(200).json({
+                success : true,
+                message : 'Stream Url retrieval success',
+                result
+            });            
+        } catch (err) {
+            res.status(500).json({
+                success : false,
+                error : err.message,
+            });
+        }
+    };
 }

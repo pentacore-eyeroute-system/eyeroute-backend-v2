@@ -6,5 +6,11 @@ export class StreamService {
             str_linked_active_wearable_id: activeWearableId,
             str_url: streamUrl,
         });
-    }
+    };
+
+    async getStream(activeWearableId) {
+        const stream = Stream.findOne({ where : { str_linked_active_wearable_id: activeWearableId } });
+
+        return stream;
+    };
 }
