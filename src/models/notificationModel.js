@@ -4,19 +4,11 @@ import { sequelize } from "../config/db.js";
 export const Notification = sequelize.define(
     'Notification',
     {
-        ntf_linked_pvi_id: {
+        ntf_linked_active_wearable_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references : {
-                model : 'persons_with_visual_impairment',
-                key : 'id',
-            },
-        },
-        ntf_linked_wearable_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references : {
-                model : 'iot_wearables',
+                model : 'active_iot_wearables',
                 key : 'id',
             },
         },

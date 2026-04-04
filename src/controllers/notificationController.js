@@ -31,8 +31,6 @@ export class NotificationController {
 
             const result = await notificationManagementService.getNotificationsByUser(cognitoSub);
 
-            console.log(result);
-
             res.status(200).json({
                 success: true,
                 message: 'Notifications retrieval success',

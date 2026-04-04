@@ -38,12 +38,12 @@ ActiveIoTWearable.belongsTo(PVI, {
     foreignKey : 'act_linked_pvi_id',
 });
 
-PVI.hasMany(Notification, {
-    foreignKey: 'ntf_linked_pvi_id',
+ActiveIoTWearable.hasMany(Notification, {
+    foreignKey: 'ntf_linked_active_wearable_id',
 });
 
-Notification.belongsTo(PVI, {
-    foreignKey : 'ntf_linked_pvi_id',
+Notification.belongsTo(ActiveIoTWearable, {
+    foreignKey : 'ntf_linked_active_wearable_id',
 });
 
 ActiveIoTWearable.hasMany(Location, {

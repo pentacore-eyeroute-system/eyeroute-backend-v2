@@ -36,8 +36,7 @@ export class NotificationManagementService {
 
         // Sets incomplete notification data to store in db
         const baseNotificationData = {
-            linkedPviId : activeIoTWearable.act_linked_pvi_id,
-            linkedWearableId : iotWearable.id,
+            linkedActiveWearableId : activeIoTWearable.id,
             isRead : false,
         };
 
@@ -58,7 +57,6 @@ export class NotificationManagementService {
                 ...baseNotificationData,
                 linkedNotificationTypeId : NOTIFICATION_TYPES_ID.CONNECTED
             });
-
         } else {
             notificationsToStore.push({
                 ...baseNotificationData,
@@ -100,9 +98,12 @@ export class NotificationManagementService {
 
             // Finds data of the current pvi  
             const pvi = await pviService.findByPviId(linkedPvi.relative_linked_pvi_id);
+            
+            // Finds active wearable iot associated to pvi id
+            const activeWearable = await activeIoTWearableService.findByPviId(linkedPvi.relative_linked_pvi_id);
 
             // Finds all notifications connected to the current pvi
-            const pviNotifications = await notificationService.getNotifications(linkedPvi.relative_linked_pvi_id);
+            const pviNotifications = await notificationService.getNotifications(activeWearable.id);
 
             let notificationType = "";
 
