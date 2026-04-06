@@ -70,11 +70,25 @@ export class NotificationManagementService {
         // Loops notifications individually before storing in db
         for (let i = 0; i < notificationsToStore.length; i++) {
             // Stores notification data in db
-            const newNotification = await notificationService.recordNewNotification(notificationsToStore[i]);
+            const notification = await notificationService.recordNewNotification(notificationsToStore[i]);
+
+            // Retrieves notification details like title and description given notification_type id
+            const notificationType = await notificationTypeService.findNotificationTypeById(notification.ntf_linked_notification_type_id);
+
+            // Finds pvi associated to active iot wearable 
+            const pvi = await pviService.findByPviId(activeIoTWearable.act_linked_pvi_id);
+
+            const notificationToSend = {
+                id                       : notification.id,
+                pvi_first_name           : pvi.pvi_first_name, // use pvi first name to know which notification belongs to whom
+                notification_title       : notificationType.ntt_title,
+                notification_description : notificationType.ntt_description,
+                notification_is_read     : notification.ntf_is_read,
+            };
 
             // Sends latest notification to location notification for real-time updates
             if (notificationWS) {
-                notificationWS.broadcastNotification(newNotification, iotWearable.id); // notification record from db is sent along with id
+                notificationWS.broadcastNotification(notificationToSend, iotWearable.id); // notification record from db is sent along with id
             } else {
                 console.error('WebSocket not initialized');
             }
