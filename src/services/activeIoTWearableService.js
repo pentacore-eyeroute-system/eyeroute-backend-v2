@@ -10,6 +10,12 @@ export class ActiveIoTWearableService {
         return activeIoTWearable;
     };
 
+    async getAllActiveWearables() {
+        const activeIoTWearables = await ActiveIoTWearable.findAll();
+
+        return activeIoTWearables;
+    };
+
     async findByWearableId(iotWearableId) {
         const activeIoTWearable = await ActiveIoTWearable.findOne({ where : { act_linked_wearable_id : iotWearableId } });
 
@@ -30,6 +36,16 @@ export class ActiveIoTWearableService {
             act_status : activeIotData.status,
         });
     };    
+
+    async updateLastSeenAt(iotWearableId, lastSeenAt) {
+        const activeIoTWearable = await ActiveIoTWearable.findOne({ where: { act_linked_wearable_id : iotWearableId } });
+
+        activeIoTWearable.update({
+            act_last_seen_at : lastSeenAt,
+        });
+
+        return activeIoTWearable.act_last_seen_at;
+    };
 
     async softDeleteActiveIoT(pviId, options = {}) {
         await ActiveIoTWearable.destroy({ where : { act_linked_pvi_id : pviId }, ...options });

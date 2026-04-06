@@ -35,6 +35,7 @@
     "http": "^0.0.1-security",
     "multer": "^2.0.2",
     "mysql2": "^3.16.1",
+    "node-cron": "^4.2.1",
     "nodemailer": "^7.0.13",
     "nodemailer-otp": "^1.0.8",
     "sequelize": "^6.37.7",

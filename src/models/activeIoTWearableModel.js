@@ -31,6 +31,10 @@ export const ActiveIoTWearable = sequelize.define(
       allowNull: false,
       defaultValue: 'Offline',
     },
+    act_last_seen_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
   },
   {
     tableName: 'active_iot_wearables',

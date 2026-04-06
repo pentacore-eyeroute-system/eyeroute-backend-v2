@@ -11,5 +11,6 @@ router.get('/level-and-status/:id', authenticateCognitoToken, iotStateController
 
 // PUT route
 router.put('/update-level-and-status/:serialNumber', authenticateXApiKey, iotStateController.updateBatteryLevelAndStatus); // serial number points to iot serial number
+router.put('/update-last-seen/:serialNumber', authenticateXApiKey, iotStateController.updateLastSeenAt); // serial number points to iot serial number
 
 export default router;

@@ -43,4 +43,24 @@ export class IoTStateController {
             });            
         }
     };
+
+    updateLastSeenAt = async (req, res) => {
+        try {
+            const iotSerialNumber = req.params.serialNumber;
+            const lastSeenAt = req.body.lastSeenAt;
+
+            const result = await iotStateService.updateLastSeenAt(iotSerialNumber, lastSeenAt);
+
+            res.status(200).json({
+                success: true,
+                message: 'Device last seen at update success',
+                result
+            });  
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });  
+        }
+    };
 }

@@ -36,4 +36,18 @@ export class IoTStateService {
             console.error('WebSocket not initialized');
         }
     };
+
+    async updateLastSeenAt(iotSerialNumber, lastSeenAt) {
+        // Finds iot record based from given serial number
+        const iotWearable = await iotWearableService.findIotBySerialNumber(iotSerialNumber);
+
+        if (!iotWearable) {
+            throw new Error('Device not found')
+        }
+
+        // Finds active iot associated to iot record, and updates battery level and status
+        const result = await activeIoTWearableService.updateLastSeenAt(iotWearable.id, lastSeenAt);
+
+        return result;
+    };
 }
