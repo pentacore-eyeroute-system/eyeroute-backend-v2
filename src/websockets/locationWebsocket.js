@@ -45,6 +45,8 @@ export class LocationWebSocket {
             result
         });
 
+        console.log("Latest Location: ", latestLocation);
+
         this.wss.clients.forEach(client => {
             if (client.readyState === WebSocket.OPEN && 
                 client.iotWearableId === iotWearableId

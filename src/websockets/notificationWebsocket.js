@@ -39,6 +39,8 @@ export class NotificationWebSocket {
             result : notificationData,
         });
 
+        console.log("Latest Notification: ", latestNotification);
+        
         this.wss.clients.forEach(client => {
             if (client.readyState === WebSocket.OPEN &&
                 client.iotWearableId === iotWearableId

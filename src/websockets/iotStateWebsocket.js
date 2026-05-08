@@ -44,6 +44,8 @@ export class IoTStateWebSocket {
             result
         });
 
+        console.log("Latest Battery and Status: ", latestIotState);
+
         this.wss.clients.forEach(client => {
             if (client.readyState === WebSocket.OPEN &&
                 client.iotWearableId === iotWearableId
