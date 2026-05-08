@@ -1,4 +1,3 @@
-import http from 'http';
 import { WebSocketServer } from 'ws';
 import { LocationWebSocket } from './locationWebsocket.js';
 import { IoTStateWebSocket } from './iotStateWebsocket.js';
@@ -8,17 +7,12 @@ let locationWebSocket;
 let iotStateWebSocket;
 let notificationWebSocket;
 
-export function createWebSocketHandler(app) {
-    const server = http.createServer(app);
+export function createWebSocketHandler(server) {
     const wss = new WebSocketServer({ server });
 
     locationWebSocket = new LocationWebSocket(wss);  
     iotStateWebSocket = new IoTStateWebSocket(wss); 
     notificationWebSocket = new NotificationWebSocket(wss);
-
-    server.listen(3000, () => {
-        console.log(`WebSocket server running`);
-    });
 };
 
 export function getLocationWebSocket() {
