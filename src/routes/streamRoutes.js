@@ -10,6 +10,6 @@ const streamController = new StreamController();
 router.post('/record-stream-url/:serialNumber', authenticateXApiKey, streamController.recordStreamUrl);
 
 // GET route
-router.get('/stream-url/:id', authenticateCognitoToken, streamController.getStreamUrl);
+router.get('/stream-url/:id', authenticateCognitoToken, streamController.getStreamUrl); // id points to pvi id
 
 export default router;
