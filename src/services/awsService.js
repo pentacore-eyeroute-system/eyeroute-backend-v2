@@ -49,7 +49,7 @@ export class AwsService {
 
         const command = new GetObjectCommand(bucketParameters);
 
-        const url = await getSignedUrl(s3, command);
+        const url = await getSignedUrl(s3, command, { expiresIn: 604800 }); //indi sha pwede tanggalin. in-extend q na lang for now yung expiration pi.
 
         return url;
     };
