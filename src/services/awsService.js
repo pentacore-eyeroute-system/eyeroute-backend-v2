@@ -49,7 +49,7 @@ export class AwsService {
 
         const command = new GetObjectCommand(bucketParameters);
 
-        const url = await getSignedUrl(s3, command, { expiresIn: 60 * 10 });
+        const url = await getSignedUrl(s3, command);
 
         return url;
     };
