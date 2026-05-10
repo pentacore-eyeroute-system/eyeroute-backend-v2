@@ -84,6 +84,7 @@ export class NotificationManagementService {
                 notification_title       : notificationType.ntt_title,
                 notification_description : notificationType.ntt_description,
                 notification_is_read     : notification.ntf_is_read,
+                notification_timestamp   : notification.createdAt,
             };
 
             // Sends latest notification to location notification for real-time updates
@@ -133,6 +134,7 @@ export class NotificationManagementService {
                     notification_title       : notificationType.ntt_title,
                     notification_description : notificationType.ntt_description,
                     notification_is_read     : pviNotification.ntf_is_read,
+                    notification_timestamp   : notification.createdAt,
                 });
             }
         }
