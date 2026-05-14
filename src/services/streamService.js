@@ -9,7 +9,7 @@ export class StreamService {
     };
 
     async getStream(activeWearableId) {
-        const stream = Stream.findOne({ where : { str_linked_active_wearable_id: activeWearableId } });
+        const stream = await Stream.findOne({ where : { str_linked_active_wearable_id: activeWearableId } });
 
         return stream;
     };

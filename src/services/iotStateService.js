@@ -10,6 +10,14 @@ export class IoTStateService {
         // Finds active wearable linked to PVI
         const activeIoTWearable = await activeIoTWearableService.findByPviId(pviId);
 
+        if (!activeIoTWearable) {
+            console.warn(`IoTStateService: No active wearable found for PVI ID ${pviId}`);
+            return {
+                iot_battery_level: 0,
+                iot_status: 'Offline',
+            };
+        }
+
         return {
             iot_battery_level : activeIoTWearable.act_battery_level,
             iot_status        : activeIoTWearable.act_status,
