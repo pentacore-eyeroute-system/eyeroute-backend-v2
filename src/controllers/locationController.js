@@ -27,7 +27,7 @@ export class LocationController {
             const latestCoordinates = {
                 latitude: req.body.latitude,
                 longitude: req.body.longitude,
-                timestamp: recordedAt,
+                timestamp : new Date(req.body.timestamp + "+08:00")
             };
 
             await locationManagementService.pushLatestLocation(iotSerialNumber, latestCoordinates);
