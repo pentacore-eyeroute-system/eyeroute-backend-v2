@@ -10,11 +10,38 @@
 // instant. Both the DB write path and the WebSocket broadcast path now read the same Date
 // object, so REST and WS can no longer disagree about what "now" the device meant.
 //
+// THE NAIVE-STRING ASSUMPTION (this is the load-bearing line):
+// IoT firmware formats wallclock with `localtime()` against the device's RTC, which is set
+// to Asia/Manila (UTC+08:00). Those naive strings represent PHT, NOT UTC. The default
+// `IOT_NAIVE_TIMESTAMP_OFFSET` is therefore '+08:00'. If you deploy this backend in a
+// region where the device is in a different timezone, override via env var. The IoT team
+// should eventually update firmware to emit ISO-with-offset or epoch milliseconds — at
+// which point this fallback becomes dead code.
+//
 // WIRE CONTRACT (any of these must produce the same UTC instant):
 //   - epoch number or numeric string (seconds OR milliseconds), OR
 //   - ISO-8601 with an explicit timezone designator (Z or +HH:MM / -HH:MM), OR
 //   - timezone-naive ISO ("YYYY-MM-DDTHH:mm:ss") or MySQL ("YYYY-MM-DD HH:mm:ss") — these
-//     are interpreted as UTC (documented assumption; the IoT firmware must comply).
+//     are interpreted as IOT_NAIVE_TIMESTAMP_OFFSET (default +08:00).
+const DEFAULT_NAIVE_OFFSET = '+08:00';
+const naiveOffset = resolveNaiveOffset(process.env.IOT_NAIVE_TIMESTAMP_OFFSET);
+
+function resolveNaiveOffset(raw) {
+    if (!raw) return DEFAULT_NAIVE_OFFSET;
+    const trimmed = String(raw).trim();
+    // Accept Z, +HH, +HHMM, +HH:MM (and minus variants).
+    if (trimmed === 'Z') return '+00:00';
+    const m = /^([+-])(\d{2}):?(\d{2})?$/.exec(trimmed);
+    if (!m) {
+        console.warn(
+            `[timestamp] Ignoring invalid IOT_NAIVE_TIMESTAMP_OFFSET=${JSON.stringify(raw)}; ` +
+            `falling back to ${DEFAULT_NAIVE_OFFSET}.`
+        );
+        return DEFAULT_NAIVE_OFFSET;
+    }
+    return `${m[1]}${m[2]}:${m[3] ?? '00'}`;
+}
+
 export function normalizeIoTTimestamp(value) {
     if (value === null || value === undefined || value === '') {
         throw new Error('Missing timestamp');
@@ -33,11 +60,18 @@ export function normalizeIoTTimestamp(value) {
             return epochToDate(Number(trimmed));
         }
 
-        // Detect explicit TZ markers. If none, append 'Z' so V8 cannot fall back to
-        // process-local interpretation — this is the line that closes the original bug.
+        // Detect explicit TZ markers. If none, append the configured offset rather than
+        // 'Z' — naive strings are device wallclock, NOT UTC. This is the line that fixes
+        // the +8h forward shift seen in the UI ("16 hours ago" instead of "1 day ago").
         const hasTz = /(Z|[+-]\d{2}:?\d{2})$/.test(trimmed);
         const isoLike = trimmed.includes('T') ? trimmed : trimmed.replace(' ', 'T');
-        const candidate = hasTz ? isoLike : `${isoLike}Z`;
+        if (!hasTz) {
+            console.warn(
+                `[timestamp] Naive timestamp received from IoT (no Z / offset): ${JSON.stringify(value)}. ` +
+                `Interpreting as ${naiveOffset}. Firmware should emit ISO-with-offset or epoch ms.`
+            );
+        }
+        const candidate = hasTz ? isoLike : `${isoLike}${naiveOffset}`;
         const date = new Date(candidate);
         if (Number.isNaN(date.getTime())) {
             throw new Error(`Invalid timestamp string: ${value}`);
@@ -55,4 +89,9 @@ function epochToDate(n) {
     const date = n <= 1e11 ? new Date(n * 1000) : new Date(n);
     if (Number.isNaN(date.getTime())) throw new Error(`Invalid epoch value: ${n}`);
     return date;
+}
+
+// Exported for tests so they can verify the resolved offset.
+export function _getNaiveOffsetForTest() {
+    return naiveOffset;
 }
