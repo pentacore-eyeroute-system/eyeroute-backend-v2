@@ -33,25 +33,34 @@ export class LocationWebSocket {
     };
 
     broadcastLocation(latestCoordinates, iotWearableId) {
+        // Previously this method forwarded `latestCoordinates.timestamp` verbatim — the
+        // raw IoT body. That made WS payloads timezone-ambiguous and they could disagree
+        // with the REST response for the same record (REST went through Sequelize, WS did
+        // not). The controller now guarantees `latestCoordinates.timestamp` is a Date, but
+        // we coerce defensively in case a future caller bypasses the controller.
+        const recordedAt = latestCoordinates.timestamp instanceof Date
+            ? latestCoordinates.timestamp
+            : new Date(latestCoordinates.timestamp);
+
+        // Serialize as ISO-8601 with the explicit 'Z' suffix. This is what Express's
+        // JSON.stringify already produces for REST responses, so REST and WS now emit
+        // byte-identical timestamp formats and the Flutter parser sees a single shape.
         const result = {
-            loc_latitude : latestCoordinates.latitude,
-            loc_longitude : latestCoordinates.longitude,
-            loc_recorded_at : latestCoordinates.timestamp,                    
+            loc_latitude: latestCoordinates.latitude,
+            loc_longitude: latestCoordinates.longitude,
+            loc_recorded_at: recordedAt.toISOString(),
         };
 
-        console.log("WebSocket source timestamp:", latestCoordinates.timestamp);
-        console.log("WebSocket response timestamp:", result.loc_recorded_at);
+        console.log('[WS-OUT] loc_recorded_at wire=', result.loc_recorded_at);
 
         const latestLocation = JSON.stringify({
-            success : true,
-            message : 'PVI latest location retrieval success',
+            success: true,
+            message: 'PVI latest location retrieval success',
             result
         });
 
-        console.log("Latest Location: ", latestLocation);
-
         this.wss.clients.forEach(client => {
-            if (client.readyState === WebSocket.OPEN && 
+            if (client.readyState === WebSocket.OPEN &&
                 client.iotWearableId === iotWearableId
             ) {
                 client.send(latestLocation);
