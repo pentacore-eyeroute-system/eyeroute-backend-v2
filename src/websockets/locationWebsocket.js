@@ -39,6 +39,9 @@ export class LocationWebSocket {
             loc_recorded_at : latestCoordinates.timestamp,                    
         };
 
+        console.log("WebSocket source timestamp:", latestCoordinates.timestamp);
+        console.log("WebSocket response timestamp:", result.loc_recorded_at);
+
         const latestLocation = JSON.stringify({
             success : true,
             message : 'PVI latest location retrieval success',

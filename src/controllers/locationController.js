@@ -33,6 +33,8 @@ export class LocationController {
         const result = await locationManagementService.getLatestLocation(pviId);
 
         try {
+            console.log("Response timestamp:", result?.loc_recorded_at);
+
             res.status(200).json({
                 success : true,
                 message : 'PVI latest location retrieval success',

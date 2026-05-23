@@ -14,8 +14,14 @@ export class LocationService {
         const location = await Location.findOne({ 
             where : { loc_linked_active_wearable_id : activeWearableId },
             order : [['loc_recorded_at', 'DESC']],
-            attributes: ['loc_latitude', 'loc_longitude', 'loc_recorded_at']  // added line kasi yung nakukuha for timestamp is yung updatedAt/createdAt
+            attributes: ['loc_latitude', 'loc_longitude', 'loc_recorded_at'],
+            raw: true,
         });
+
+        if (location) {
+            console.log("DB loc_recorded_at:", location.loc_recorded_at);
+            console.log('Latest location DTO uses loc_recorded_at:', location);
+        }
 
         return location;
     };
