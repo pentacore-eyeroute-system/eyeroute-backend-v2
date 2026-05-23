@@ -1,0 +1,43 @@
+-- One-time data correction for the naive-PHT-misinterpreted-as-UTC bug.
+--
+-- BACKGROUND:
+-- Until the IOT_NAIVE_TIMESTAMP_OFFSET=+08:00 fix was deployed, the backend stored every
+-- naive timestamp emitted by the IoT firmware (PHT wallclock) as if it were UTC. The
+-- effect is that every row written by the previous code paths has a `loc_recorded_at`
+-- value that is 8 hours AHEAD of the real moment the GPS point was recorded.
+--
+-- This script subtracts 8 hours from every such row so the wallclock stored in MySQL
+-- once again represents the true UTC instant (matching the Sequelize +00:00 contract).
+--
+-- HOW TO RUN SAFELY:
+--   1. Take a backup snapshot of the `locations` table.
+--   2. Confirm the cutoff timestamp below — it should be the moment you deployed the
+--      fix to production (when records started being written correctly). Adjust to fit
+--      your deploy time.
+--   3. Run the SELECT first to preview affected rows.
+--   4. Run the UPDATE inside a transaction; verify a sample row before COMMIT.
+--   5. If any rows look wrong, ROLLBACK.
+
+-- ------------------------------------------------------------------
+-- Step 1: Preview affected rows. Replace the cutoff with your deploy time (UTC).
+-- ------------------------------------------------------------------
+-- SELECT id, loc_recorded_at, createdAt
+-- FROM locations
+-- WHERE createdAt < '2026-05-23 12:00:00'   -- <-- your deploy time, UTC
+-- ORDER BY id DESC
+-- LIMIT 50;
+
+-- ------------------------------------------------------------------
+-- Step 2: Apply the shift. Run inside a transaction.
+-- ------------------------------------------------------------------
+-- START TRANSACTION;
+--
+-- UPDATE locations
+-- SET loc_recorded_at = DATE_SUB(loc_recorded_at, INTERVAL 8 HOUR)
+-- WHERE createdAt < '2026-05-23 12:00:00';   -- <-- your deploy time, UTC
+--
+-- -- Verify a known row before committing.
+-- SELECT id, loc_recorded_at, createdAt FROM locations ORDER BY id DESC LIMIT 5;
+--
+-- COMMIT;
+-- ROLLBACK;   -- use this instead of COMMIT if the verification fails.
