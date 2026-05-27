@@ -130,11 +130,12 @@ export class NotificationManagementService {
 
                 notifications.push({
                     id                       : pviNotification.id,
+                    pvi_id                   : pvi.id,
                     pvi_first_name           : pvi.pvi_first_name, // use pvi first name to know which notification belongs to whom
                     notification_title       : notificationType.ntt_title,
                     notification_description : notificationType.ntt_description,
                     notification_is_read     : pviNotification.ntf_is_read,
-                    notification_timestamp   : notification.createdAt,
+                    notification_timestamp   : pviNotification.createdAt,
                 });
             }
         }
