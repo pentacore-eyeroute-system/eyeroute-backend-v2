@@ -1,32 +1,33 @@
-import { DataTypes } from "sequelize";
+import sequelizePkg from "sequelize";
+const { DataTypes } = sequelizePkg;
 import { sequelize } from "../config/db.js";
 
 export const Location = sequelize.define(
-  'Location',
+  "Location",
   {
     loc_linked_active_wearable_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references : {
-        model: 'active_iot_wearables',
-        key: 'id'
-      }
+      references: {
+        model: "active_iot_wearables",
+        key: "id",
+      },
     },
     loc_latitude: {
       type: DataTypes.DECIMAL(10, 7),
-      allowNull: false
+      allowNull: false,
     },
     loc_longitude: {
       type: DataTypes.DECIMAL(10, 7),
-      allowNull: false
+      allowNull: false,
     },
     loc_recorded_at: {
       type: DataTypes.DATE,
-      allowNull: false
-    }
+      allowNull: false,
+    },
   },
-  { 
-    tableName: 'locations',
-    timestamps: true
-  }
+  {
+    tableName: "locations",
+    timestamps: true,
+  },
 );

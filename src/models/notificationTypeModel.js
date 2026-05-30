@@ -1,20 +1,21 @@
-import { DataTypes } from "sequelize";
+import sequelizePkg from "sequelize";
+const { DataTypes } = sequelizePkg;
 import { sequelize } from "../config/db.js";
 
 export const NotificationType = sequelize.define(
-    'NotificationType',
-    {
-        ntt_title: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        ntt_description: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
+  "NotificationType",
+  {
+    ntt_title: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    {
-        tableName: 'notification_types',
-        timestamps: true,
-    }
+    ntt_description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  {
+    tableName: "notification_types",
+    timestamps: true,
+  },
 );

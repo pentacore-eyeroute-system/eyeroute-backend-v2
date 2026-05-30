@@ -1,25 +1,26 @@
-import { DataTypes } from "sequelize";
+import sequelizePkg from "sequelize";
+const { DataTypes } = sequelizePkg;
 import { sequelize } from "../config/db.js";
 
 export const IoTWearable = sequelize.define(
-  'IoTWearable',
+  "IoTWearable",
   {
     wearable_serial_number: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
     },
     wearable_activation_code: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     wearable_activated_at: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
   },
   {
-    tableName: 'iot_wearables',
+    tableName: "iot_wearables",
     timestamps: true,
-  }
+  },
 );

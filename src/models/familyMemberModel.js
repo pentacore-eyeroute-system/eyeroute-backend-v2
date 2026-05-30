@@ -1,4 +1,5 @@
-import { DataTypes } from "sequelize";
+import sequelizePkg from "sequelize";
+const { DataTypes } = sequelizePkg;
 import { sequelize } from "../config/db.js";
 
 export const FamilyMember = sequelize.define(
