@@ -6,6 +6,8 @@ import { ActiveIoTWearable } from "./activeIoTWearableModel.js";
 import { Notification } from "./notificationModel.js";
 import { Location } from "./locationModel.js";
 import { NotificationType } from "./notificationTypeModel.js";
+import { News } from "./newsModel.js";
+import { NewsPictures } from "./newsPictureModel.js";
 
 FamilyMember.hasMany(FamilyPviLink, {
     foreignKey: 'relative_linked_fam_id',
@@ -61,4 +63,12 @@ NotificationType.hasMany(Notification, {
 
 Notification.belongsTo(NotificationType, {
     foreignKey: 'ntf_linked_notification_type_id',
+});
+
+News.hasMany(NewsPictures, {
+    foreignKey: 'npi_linked_news_id',
+});
+
+NewsPictures.belongsTo(News, {
+    foreignKey: 'npi_linked_news_id',
 });

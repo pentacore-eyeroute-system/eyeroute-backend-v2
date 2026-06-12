@@ -54,6 +54,32 @@ export class AwsService {
         return url;
     };
 
+    async getNewsPic(fileKey) {
+        const bucketParameters = {
+            Bucket: S3_BUCKET_NAME,
+            Key: fileKey,
+        };
+
+        const command = new GetObjectCommand(bucketParameters);
+
+        const url = await getSignedUrl(s3, command, { expiresIn: 60 * 10 });
+
+        return url;
+    };
+
+    async getGalleryPic(fileKey) {
+        const bucketParameters = {
+            Bucket: S3_BUCKET_NAME,
+            Key: fileKey,
+        };
+
+        const command = new GetObjectCommand(bucketParameters);
+
+        const url = await getSignedUrl(s3, command, { expiresIn: 60 * 10 });
+
+        return url;
+    }; 
+
     /*
         Permanently deletes Family Member credentials in Cognito by Username (Automatic UUID Generation)
     */
