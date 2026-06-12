@@ -1,4 +1,8 @@
 import { Notification } from "../models/notificationModel.js";
+import { NotificationType } from "../models/notificationTypeModel.js";
+import { ActiveIoTWearable } from "../models/activeIoTWearableModel.js";
+import { PVI } from "../models/personWithVisualImpairmentModel.js";
+import { FamilyPviLink } from "../models/familyPviLinkModel.js";
 
 export class NotificationService {
     async recordNewNotification(notificationData) {
@@ -11,8 +15,32 @@ export class NotificationService {
         return notification;
     };
 
-    async getNotifications(activeWearableId) {
-        const notifications = await Notification.findAll({ where : { ntf_linked_active_wearable_id : activeWearableId } });
+    async getNotifications(userId) {
+        const notifications = await Notification.findAll({
+            include: [
+                {
+                    model: ActiveIoTWearable,
+                    required: true,
+                    include: [
+                        {
+                            model: PVI,
+                            required: true,
+                            include: [
+                                {
+                                    model: FamilyPviLink,
+                                    required: true,
+                                    where: { relative_linked_fam_id : userId }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    model: NotificationType,
+                    required: true,
+                }
+            ]
+        });
 
         return notifications;
     };

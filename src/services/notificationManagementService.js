@@ -103,44 +103,18 @@ export class NotificationManagementService {
             throw new Error('User not found');
         }
 
-        // Finds all pvi linked to user
-        const linkedPvis = await userPviLinkService.findByFamId(user.id);
+        const notifications = await notificationService.getNotifications(user.id);
 
-        let notifications = [];
-
-        for (let i = 0; i < linkedPvis.length; i++) {
-            const linkedPvi = linkedPvis[i];
-
-            // Finds data of the current pvi  
-            const pvi = await pviService.findByPviId(linkedPvi.relative_linked_pvi_id);
-            
-            // Finds active wearable iot associated to pvi id
-            const activeWearable = await activeIoTWearableService.findByPviId(linkedPvi.relative_linked_pvi_id);
-
-            // Finds all notifications connected to the current pvi
-            const pviNotifications = await notificationService.getNotifications(activeWearable.id);
-
-            let notificationType = "";
-
-            for (let j = 0; j < pviNotifications.length; j++) {
-                const pviNotification = pviNotifications[j];
-
-                // Retrieves notification details like title and description given notification_type id
-                notificationType = await notificationTypeService.findNotificationTypeById(pviNotification.ntf_linked_notification_type_id);
-
-                notifications.push({
-                    id                       : pviNotification.id,
-                    pvi_id                   : pvi.id,
-                    pvi_first_name           : pvi.pvi_first_name, // use pvi first name to know which notification belongs to whom
-                    notification_title       : notificationType.ntt_title,
-                    notification_description : notificationType.ntt_description,
-                    notification_is_read     : pviNotification.ntf_is_read,
-                    notification_timestamp   : pviNotification.createdAt,
-                });
-            }
-        }
-
-        return notifications;
+        return notifications.map(notification => ({
+                id: notification.id,
+                pvi_id: notification.ActiveIoTWearable.PVI.id,
+                pvi_first_name: notification.ActiveIoTWearable.PVI.pvi_first_name,
+                notification_title: notification.NotificationType.ntt_title,
+                notification_description: notification.NotificationType.ntt_description,
+                notification_is_read: notification.ntf_is_read,
+                notification_timestamp: notification.createdAt,
+            })
+        );
     };
 
     async updateNotificationIsReadStatus(ntfId) {
