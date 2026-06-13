@@ -1,4 +1,5 @@
 import { PviManagementService } from "../services/pviManagementService.js";
+import { pviSchema } from "../validation/pviValidation.js";
 
 const pviManagementService = new PviManagementService();
 
@@ -7,22 +8,26 @@ export class PviController {
     createPviAndLinkUser = async (req, res) => {
         try {
             const cognitoSub    = req.user.sub;
-            const pviData       = {
-                pviFirstname : req.body.pviFirstname,
-                pviLastname  : req.body.pviLastname,
-                pviGender    : req.body.pviGender,
-            };
+            const parsedPviData = pviSchema.safeParse(req.body);
+
+            if (!parsedPviData.success) {
+                return res.status(400).json({
+                    success: false,
+                    error: parsedPviData.error.flatten().fieldErrors
+                });
+            }
+
             const iotData       = {
                 inputIoTSerialNumber   : req.body.deviceSerialNumber,
                 inputIoTActivationCode : req.body.deviceActivationCode,
             };
-            const relationship  = req.body.relationship;
+            const relationship  = parsedPviData.data.relationship;
             //debugging
             console.log('DEBUG: createPviAndLinkUser called');
             console.log('DEBUG: cognitoSub:', cognitoSub);
             console.log('DEBUG: iotData:', iotData);
 
-            const result = await pviManagementService.createPviAndLinkUser(cognitoSub, pviData, iotData, relationship);
+            const result = await pviManagementService.createPviAndLinkUser(cognitoSub, parsedPviData.data, iotData, relationship);
             //debugging
             console.log('DEBUG: PVI creation successful, result:', result);
 
@@ -109,10 +114,32 @@ export class PviController {
         try {
             const cognitoSub = req.user.sub;
             const pviId = req.params.id;
+            const rawPviData = {
+                pviFirstname: req.body.firstname,
+                pviLastname: req.body.lastname,
+                pviGender: req.body.gender,
+                relationship: req.body.relationship
+            };
+            
+            const parsedPviData = pviSchema.safeParse(rawPviData);
+
+            if (!parsedPviData.success) {
+                return res.status(400).json({
+                    success: false,
+                    error: parsedPviData.error.flatten().fieldErrors
+                });
+            }
 
             console.log('Update PVI Request received:', { cognitoSub, pviId, body: req.body });
 
-            const result = await pviManagementService.updatePviInfoAndRelationship(cognitoSub, pviId, { ...req.body });
+            const pviData = {
+                firstname: parsedPviData.data.pviFirstname,
+                lastname: parsedPviData.data.pviLastname,
+                gender: parsedPviData.data.pviGender,
+                relationship: parsedPviData.data.relationship
+            };
+
+            const result = await pviManagementService.updatePviInfoAndRelationship(cognitoSub, pviId, pviData);
 
             res.status(200).json({
                 success: true,
