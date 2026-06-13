@@ -8,6 +8,8 @@ import { Location } from "./locationModel.js";
 import { NotificationType } from "./notificationTypeModel.js";
 import { News } from "./newsModel.js";
 import { NewsPictures } from "./newsPictureModel.js";
+import { Gallery } from "./galleryModel.js";
+import { GalleryPicture } from "./galleryPictureModel.js";
 
 FamilyMember.hasMany(FamilyPviLink, {
     foreignKey: 'relative_linked_fam_id',
@@ -71,4 +73,12 @@ News.hasMany(NewsPictures, {
 
 NewsPictures.belongsTo(News, {
     foreignKey: 'npi_linked_news_id',
+});
+
+Gallery.hasMany(GalleryPicture, {
+    foreignKey: 'gpi_linked_gallery_id',
+});
+
+GalleryPicture.belongsTo(Gallery, {
+    foreignKey: 'gpi_linked_gallery_id',
 });
