@@ -19,7 +19,8 @@ export const FamilyMember = sequelize.define(
             allowNull: false,
         },
         fam_gender : {
-            type: DataTypes.STRING,
+            type: DataTypes.ENUM('Female', 'Male', 'Prefer Not to Say'),
+            defaultValue: 'Prefer Not to Say',
             allowNull: false,
         },
         fam_profile_pic_path : {

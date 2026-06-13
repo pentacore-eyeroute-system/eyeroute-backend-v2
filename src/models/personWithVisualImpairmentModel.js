@@ -19,7 +19,8 @@ export const PVI = sequelize.define(
       allowNull: false,
     },
     pvi_gender: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM('Female', 'Male', 'Prefer Not to Say'),
+      defaultValue: 'Prefer Not to Say',
       allowNull: false,
     },
   },

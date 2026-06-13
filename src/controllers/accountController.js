@@ -1,4 +1,5 @@
 import { AccountService } from "../services/accountService.js";
+import { userSchema } from "../validation/userValidation.js";
 
 const accountService = new AccountService();
 
@@ -6,8 +7,16 @@ export class AccountController {
     registerFamilyMember = async (req, res) => {
         try {
             const cognitoSub = req.user.sub;
+            const parsedFamData = userSchema.safeParse(req.body);
 
-            const result = await accountService.registerFamilyMember({ ...req.body, cognitoSub });
+            if (!parsedFamData.success) {
+                return res.status(400).json({
+                    success: false,
+                    error: parsedFamData.error.flatten().fieldErrors
+                });
+            }
+
+            const result = await accountService.registerFamilyMember({ ...parsedFamData.data, cognitoSub });
 
             res.status(201).json({
                 success: true,
@@ -83,8 +92,16 @@ export class AccountController {
     updateFamilyMemberInfo = async (req, res) => {
         try {
             const cognitoSub = req.user.sub;
+            const parsedFamData = userSchema.safeParse(req.body);
 
-            const result = await accountService.updateFamilyMemberInfo({ ...req.body, cognitoSub });
+            if (!parsedFamData.success) {
+                return res.status(400).json({
+                    success: false,
+                    error: parsedFamData.error.flatten().fieldErrors
+                });
+            }
+
+            const result = await accountService.updateFamilyMemberInfo({ ...parsedFamData.data, cognitoSub });
 
             res.status(200).json({
                 success: true,

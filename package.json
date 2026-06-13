@@ -40,7 +40,8 @@
     "nodemailer-otp": "^1.0.8",
     "sequelize": "^6.37.8",
     "uuid": "^13.0.0",
-    "ws": "^8.20.0"
+    "ws": "^8.20.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
