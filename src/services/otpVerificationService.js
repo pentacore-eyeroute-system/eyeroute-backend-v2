@@ -17,10 +17,6 @@ export class OtpVerificationService {
             order: [['createdAt', 'DESC']] 
         });
 
-        if (!otpRecord) {
-            throw new Error('OTP record not found.');
-        }
-
         return otpRecord;
     };
 

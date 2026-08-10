@@ -99,7 +99,7 @@ export class AwsService {
 
     async sendEmail(to, subject, body) {
         const command = new SendEmailCommand({
-            Source: SES_FROM_EMAIL,
+            Source: `EyeRoute <${SES_FROM_EMAIL}>`,
             Destination: { ToAddresses: [to] },
             Message: {
                 Subject: {

@@ -9,6 +9,24 @@ const awsService = new AwsService();
 
 export class AuthOrchestratorService {
     async initiateOtp(otpData) {
+        // Retrieve latest otp record associated to recipient's email
+        const existingOtpRecord = await otpVerificationService.findByEmail(otpData.email);
+
+        if (existingOtpRecord) {
+            // Check if user is still blocked from requesting new otp
+            if (existingOtpRecord.ovr_blocked_until && 
+                new Date() < existingOtpRecord.ovr_blocked_until) {
+                throw new Error('Too many attempts. Try again later.')
+            }
+
+            // Note: ovr_is_used won't be checked to allow new otp request when account with the same email gets deleted
+
+            // Check if otp is still valid
+            if (new Date() < existingOtpRecord.ovr_expires_at) {
+                throw new Error('Please wait before requesting a new OTP.')
+            }
+        }
+
         // Generate otp
         const otp = otpUtil.generateOtp();
 
@@ -16,7 +34,7 @@ export class AuthOrchestratorService {
         const hashedOtp = await otpUtil.hashOtp(otp);
 
         // Store otp
-        const otpRecord = await otpVerificationService.storeOtp({
+        await otpVerificationService.storeOtp({
             ...otpData,
             hashedOtp
         });
@@ -31,6 +49,10 @@ export class AuthOrchestratorService {
     async verifyOtp(verificationData) {
         // Retrieve latest otp record associated to recipient's email
         const otpRecord = await otpVerificationService.findByEmail(verificationData.email);
+
+        if (!otpRecord) {
+            throw new Error('OTP record not found.');
+        }
 
         // Check if otp has been used
         if (otpRecord.ovr_is_used) {

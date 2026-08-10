@@ -5,7 +5,7 @@ const router = express.Router();
 const authController = new AuthController();
 
 // POST route
-router.post('/initiate', authController.initiateOtp);
-router.post('/verify', authController.verifyOtp);
+router.post('/initiate-otp', authController.initiateOtp);
+router.post('/verify-otp', authController.verifyOtp);
 
 export default router;

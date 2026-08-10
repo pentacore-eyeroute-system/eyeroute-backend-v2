@@ -25,6 +25,6 @@ app.use('/api/iot', iotStateRoutes);
 app.use('/api/stream', streamRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/gallery', galleryRoutes);
-app.use('/api/register', authRoutes);
+app.use('/api/auth', authRoutes);
 
 export default app;
