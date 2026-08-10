@@ -6,5 +6,6 @@ const authController = new AuthController();
 
 // POST route
 router.post('/initiate', authController.initiateOtp);
+router.post('/verify', authController.verifyOtp);
 
 export default router;

@@ -17,6 +17,23 @@ export class OtpVerificationService {
             order: [['createdAt', 'DESC']] 
         });
 
+        if (!otpRecord) {
+            throw new Error('OTP record not found.');
+        }
+
         return otpRecord;
+    };
+
+    async updateAttemptsAndBlockedTime(otpRecord, attempts, blockedUntil) {
+        await otpRecord.update({
+            ovr_attempts: attempts,
+            ovr_blocked_until: blockedUntil,
+        });
+    };
+
+    async updateIsUsed(otpRecord, isUsed) {
+        await otpRecord.update({
+            ovr_is_used: isUsed,
+        });
     };
 }
