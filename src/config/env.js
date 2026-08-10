@@ -30,4 +30,7 @@ export default {
     iot: {
         xApiKey: process.env.IOT_X_API_KEY,
     },
+    ses: {
+        sesFromEmail: process.env.SES_FROM_EMAIL,
+    }
 }

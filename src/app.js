@@ -8,6 +8,7 @@ import iotStateRoutes from './routes/iotStateRoutes.js';
 import streamRoutes from './routes/streamRoutes.js';
 import newsRoutes from './routes/newsRoutes.js'
 import galleryRoutes from './routes/galleryRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 import './models/index.js';  // Imports all models
 
 const app = express();
@@ -24,5 +25,6 @@ app.use('/api/iot', iotStateRoutes);
 app.use('/api/stream', streamRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/gallery', galleryRoutes);
+app.use('/api/register', authRoutes);
 
 export default app;

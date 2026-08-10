@@ -2,7 +2,7 @@ import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { CognitoIdentityProviderClient, AdminDeleteUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { v4 as uuidv4 } from 'uuid';
-
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import config from '../config/env.js';
 
 const AWS_ACCESS_KEY_ID = config.s3.accessKeyId;
@@ -10,6 +10,7 @@ const AWS_SECRET_ACCESS_KEY = config.s3.secretAccessKey;
 const S3_BUCKET_REGION = config.s3.s3BucketRegion;
 const S3_BUCKET_NAME = config.s3.s3BucketName;
 const COGNITO_USER_POOL_ID = config.cognito.userPoolId;
+const SES_FROM_EMAIL = config.ses.sesFromEmail;
 
 const s3 = new S3Client({
     credentials: {
@@ -20,6 +21,10 @@ const s3 = new S3Client({
 });
 
 const cognitoClient = new CognitoIdentityProviderClient({ region: S3_BUCKET_REGION });
+
+const sesClient = new SESClient({
+    region: S3_BUCKET_REGION
+});
 
 export class AwsService {
     async uploadProfilePic(file) {
@@ -90,5 +95,26 @@ export class AwsService {
         });
 
         await cognitoClient.send(deleteCommand);
+    };
+
+    async sendEmail(to, subject, body) {
+        const command = new SendEmailCommand({
+            Source: SES_FROM_EMAIL,
+            Destination: { ToAddresses: [to] },
+            Message: {
+                Subject: {
+                    Data: subject,
+                    Charset: "UTF-8"
+                },
+                Body: {
+                    Text: {
+                        Data: body,
+                        Charset: "UTF-8"
+                    }
+                }
+            }
+        });
+
+        return await sesClient.send(command);
     };
 }

@@ -8,3 +8,4 @@ import './notificationTypeModel.js';
 import './notificationModel.js';
 import './locationModel.js';
 import './streamModel.js';
+import './otpVerificationModel.js';
