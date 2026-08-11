@@ -4,7 +4,7 @@ import pkg from "sequelize";
 const { DataTypes } = pkg;
 
 export const OtpVerification = sequelize.define(
-    'otp_verification',
+    'OtpVerification',
     {
         ovr_email: {
             type: DataTypes.STRING,
