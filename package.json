@@ -40,6 +40,7 @@
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.13",
     "nodemailer-otp": "^1.0.8",
+    "qrcode": "^1.5.4",
     "sequelize": "^6.37.8",
     "uuid": "^13.0.0",
     "ws": "^8.20.0",

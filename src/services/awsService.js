@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { CognitoIdentityProviderClient, AdminDeleteUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { v4 as uuidv4 } from 'uuid';
@@ -116,5 +116,39 @@ export class AwsService {
         });
 
         return await sesClient.send(command);
+    };
+
+    async iotQrCodeExists(fileKey) {
+        const bucketParameters = {
+            Bucket: S3_BUCKET_NAME,
+            Key: fileKey,
+        };
+
+        const command = new HeadObjectCommand(bucketParameters);
+
+        try {
+            await s3.send(command);
+
+            return true;
+        } catch (err) {
+            if (err.$metadata?.httpStatusCode === 404) {
+                return false;
+            }
+
+            throw err;
+        }
+    };
+
+    async uploadIotQrCode(fileKey, buffer, mimetype) {       
+        const uploadParameters = {
+            Bucket: S3_BUCKET_NAME,
+            Key: fileKey,
+            Body: buffer,
+            ContentType: mimetype,
+        };
+
+        const command = new PutObjectCommand(uploadParameters);
+
+        await s3.send(command);
     };
 }

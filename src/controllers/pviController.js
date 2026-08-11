@@ -19,7 +19,7 @@ export class PviController {
 
             const iotData       = {
                 inputIoTSerialNumber   : req.body.deviceSerialNumber,
-                inputIoTActivationCode : req.body.deviceActivationCode,
+                inputIoTActivationCode : parseInt(req.body.deviceActivationCode, 10),
             };
             const relationship  = parsedPviData.data.relationship;
             //debugging
