@@ -9,6 +9,7 @@ import streamRoutes from './routes/streamRoutes.js';
 import newsRoutes from './routes/newsRoutes.js'
 import galleryRoutes from './routes/galleryRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import navigationRoutes from './routes/navigationRoutes.js';
 import './models/index.js';  // Imports all models
 
 const app = express();
@@ -26,5 +27,6 @@ app.use('/api/stream', streamRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/navigation', navigationRoutes);
 
 export default app;

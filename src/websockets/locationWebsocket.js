@@ -39,7 +39,8 @@ export class LocationWebSocket {
         const result = {
             loc_latitude: latestCoordinates.latitude,
             loc_longitude: latestCoordinates.longitude,
-            loc_recorded_at: latestCoordinates.timestamp.toISOString(),
+            // loc_recorded_at: latestCoordinates.timestamp.toISOString(), // from actual iot
+            loc_recorded_at: latestCoordinates.timestamp // for postman testing purpose only
         };
 
         const latestLocation = JSON.stringify({

@@ -1,0 +1,28 @@
+import { NavigationRouteManagementService } from "../services/navigationRouteManagementService.js";
+
+const navigationRouteManagementService = new NavigationRouteManagementService();
+
+export class NavigationRouteController {
+    addNavigationRoute = async (req, res) => {
+        try {
+            const iotSerialNumber = req.params.serialNumber;
+            const navigationData = {
+                destinationName: req.body.destinationName,
+                status: req.body.status,
+                startedAt: req.body.startedAt,
+            }
+
+            await navigationRouteManagementService.addNavigationRoute(iotSerialNumber, navigationData);
+
+            res.status(201).json({
+                success: true,
+                message: 'Navigation route initiation success',
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });
+        }
+    };
+}

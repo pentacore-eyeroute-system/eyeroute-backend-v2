@@ -2,10 +2,12 @@ import { ActiveIoTWearableService } from "./activeIoTWearableService.js";
 import { LocationService } from "./locationService.js";
 import { IoTWearableService } from "./ioTWearableService.js";
 import { getLocationWebSocket } from "../websockets/index.js";
+import { NavigationRouteService } from "./navigationRouteService.js";
 
 const activeWearableService = new ActiveIoTWearableService();
 const locationService = new LocationService();
 const iotWearableService = new IoTWearableService();
+const navigationRouteService = new NavigationRouteService();
 
 export class LocationManagementService {
     async pushLatestLocation(iotSerialNumber, latestCoordinates) {
@@ -23,8 +25,19 @@ export class LocationManagementService {
             throw new Error('Device not yet activated')
         }
 
-        // Stores latest gps coordinates
-        await locationService.pushLatestLocation(activeWearable.id, latestCoordinates);
+        // Checks if there is active navigation associated to active iot id
+        const navigationRoute = await navigationRouteService.checksActiveNavigation(activeWearable.id);
+
+        console.log("Navigation Route Id:", navigationRoute);
+
+        // If there's no active navigation
+        if (!navigationRoute) {
+            // Stores latest gps coordinates
+            await locationService.pushLatestLocation(activeWearable.id, latestCoordinates, null);
+        } else {
+            // Stores latest gps coordinates
+            await locationService.pushLatestLocation(activeWearable.id, latestCoordinates, navigationRoute.id);
+        }
 
         // Sends latest coordinates to location websocket for real-time updates
         const locationWS = getLocationWebSocket();
