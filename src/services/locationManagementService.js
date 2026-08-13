@@ -28,8 +28,6 @@ export class LocationManagementService {
         // Checks if there is active navigation associated to active iot id
         const navigationRoute = await navigationRouteService.checksActiveNavigation(activeWearable.id);
 
-        console.log("Navigation Route Id:", navigationRoute);
-
         // If there's no active navigation
         if (!navigationRoute) {
             // Stores latest gps coordinates

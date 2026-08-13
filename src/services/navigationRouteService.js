@@ -1,3 +1,4 @@
+import { where } from "sequelize";
 import { NavigationRoute } from "../models/navigationRouteModel.js";
 
 export class NavigationRouteService {
@@ -19,5 +20,16 @@ export class NavigationRouteService {
         });
 
         return navigationRouteRecord;
+    };
+
+    async updateNavigationStatus(navigationRouteId, navigationData) {
+        await NavigationRoute.update({
+            nav_status: navigationData.status,
+            nav_completed_at: navigationData.completedAt,
+            nav_cancelled_at: navigationData.cancelledAt,
+        }, { where : { 
+                id : navigationRouteId
+            }
+        });
     };
 }

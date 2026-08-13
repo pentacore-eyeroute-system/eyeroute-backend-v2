@@ -25,4 +25,27 @@ export class NavigationRouteController {
             });
         }
     };
+
+    updateNavigationStatus = async (req, res) => {
+        try {
+            const iotSerialNumber = req.params.serialNumber;
+            const navigationData = {
+                status: req.body.status,
+                completedAt: req.body.completedAt,
+                cancelledAt: req.body.cancelledAt,
+            }
+
+            await navigationRouteManagementService.updateNavigationStatus(iotSerialNumber, navigationData);
+
+            res.status(201).json({
+                success: true,
+                message: 'Navigation route update success',
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });
+        }
+    };
 }

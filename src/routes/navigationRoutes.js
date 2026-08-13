@@ -8,6 +8,7 @@ const navigationRouteController = new NavigationRouteController();
 // POST route
 router.post('/:serialNumber', authenticateXApiKey, navigationRouteController.addNavigationRoute); // serial number points to iot serial number
 
-
+// PATCH route
+router.patch('/:serialNumber/status', authenticateXApiKey, navigationRouteController.updateNavigationStatus); // serial number points to iot serial number
 
 export default router;
