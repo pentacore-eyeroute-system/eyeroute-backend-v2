@@ -48,4 +48,23 @@ export class NavigationRouteController {
             });
         }
     };
+
+    getAllRoutesWithDestination = async (req, res) => {
+        try {
+            const pviId = req.params.id;
+
+            const result = await navigationRouteManagementService.getAllRoutesWithDestination(pviId);
+
+            res.status(200).json({
+                success: true,
+                message: 'PVI latest location retrieval success',
+                result,
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                error: err.message,
+            });
+        }
+    };
 }

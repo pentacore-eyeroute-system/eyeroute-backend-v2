@@ -51,4 +51,18 @@ export class NavigationRouteManagementService {
         // Update navigation route status and completed/ cancelled timestamp
         await navigationRouteService.updateNavigationStatus(navigationRoute.id, navigationData);        
     };
+
+    async getAllRoutesWithDestination(pviId) {
+        // Finds active wearable linked to PVI
+        const activeIoTWearable = await activeWearableService.findByPviId(pviId);
+
+        if (!activeIoTWearable) {
+            throw new Error('Device not found')
+        }
+
+        // Returns all navigation history associated to active wearable id
+        const navigationRoutes = await navigationRouteService.getAllRoutesWithDestination(activeIoTWearable.id);
+
+        return navigationRoutes;
+    };
 }

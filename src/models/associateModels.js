@@ -86,8 +86,9 @@ GalleryPicture.belongsTo(Gallery, {
 
 NavigationRoute.hasMany(Location, {
     foreignKey: 'loc_linked_navigation_route_id',
+    as: 'locationCoordinates',
 });
 
-Location.belongsTo(Location, {
+Location.belongsTo(NavigationRoute, {
     foreignKey: 'loc_linked_navigation_route_id',
 });
