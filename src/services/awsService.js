@@ -1,6 +1,6 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { CognitoIdentityProviderClient, AdminDeleteUserCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoIdentityProviderClient, AdminCreateUserCommand, AdminSetUserPasswordCommand, AdminDeleteUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { v4 as uuidv4 } from 'uuid';
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import config from '../config/env.js';
@@ -84,6 +84,39 @@ export class AwsService {
 
         return url;
     }; 
+
+    async createCognitoUser(email) {
+        const command = new AdminCreateUserCommand({
+            UserPoolId: COGNITO_USER_POOL_ID,
+            Username: email,
+            MessageAction: 'SUPPRESS',
+            UserAttributes: [
+                {
+                    Name: "email",
+                    Value: email
+                },
+                {
+                    Name: "email_verified",
+                    Value: "true"
+                }
+            ]
+        });
+
+        const result = await cognitoClient.send(command);
+
+        return result.User;
+    };
+
+    async setCognitoUserPassword(email, password) {
+        const command = new AdminSetUserPasswordCommand({
+            UserPoolId: COGNITO_USER_POOL_ID,
+            Username: email,
+            Password: password,
+            Permanent: true,
+        });
+
+        await cognitoClient.send(command);
+    };
 
     /*
         Permanently deletes Family Member credentials in Cognito by Username (Automatic UUID Generation)

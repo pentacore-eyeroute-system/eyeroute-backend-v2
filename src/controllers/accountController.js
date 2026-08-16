@@ -1,5 +1,4 @@
 import { AccountService } from "../services/accountService.js";
-import { userSchema } from "../validation/userValidation.js";
 
 const accountService = new AccountService();
 
@@ -7,16 +6,13 @@ export class AccountController {
     registerFamilyMember = async (req, res) => {
         try {
             const cognitoSub = req.user.sub;
-            const parsedFamData = userSchema.safeParse(req.body);
+            const userData = {
+                famFirstname: req.body.famFirstname,
+                famLastname: req.body.famLastname,
+                famGender: req.body.famGender,
+            };
 
-            if (!parsedFamData.success) {
-                return res.status(400).json({
-                    success: false,
-                    error: parsedFamData.error.flatten().fieldErrors
-                });
-            }
-
-            const result = await accountService.registerFamilyMember({ ...parsedFamData.data, cognitoSub });
+            const result = await accountService.registerFamilyMember({ ...userData, cognitoSub });
 
             res.status(201).json({
                 success: true,

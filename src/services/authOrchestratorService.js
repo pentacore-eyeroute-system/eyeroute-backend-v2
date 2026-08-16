@@ -2,10 +2,12 @@ import { OtpUtil } from "../utils/otpUtil.js";
 import { OtpVerificationService } from "./otpVerificationService.js";
 import { AwsService } from "./awsService.js";
 import { otpEmailTemplate } from "../templates/otpEmail.js";
+import { AccountService } from "./accountService.js";
 
 const otpUtil = new OtpUtil();
 const otpVerificationService = new OtpVerificationService();
 const awsService = new AwsService();
+const accountService = new AccountService();
 
 export class AuthOrchestratorService {
     async initiateOtp(otpData) {
@@ -102,8 +104,32 @@ export class AuthOrchestratorService {
         // Update is used if valid otp
         await otpVerificationService.updateIsUsed(otpRecord, true);
 
-        return {
-            blocked: false
+        // Checks if flow to differentiate which verify otp is from sign up vs forgot password
+        if (verificationData.flow === "sign-up") {
+            // Create cognito user
+            const cognitoUser = await awsService.createCognitoUser(verificationData.email);
+
+            // Retrieve cognito sub
+            const cognitoSub = cognitoUser.Attributes.find(attribute => attribute.Name === "sub").Value;
+
+            // Set cognito password
+            await awsService.setCognitoUserPassword(verificationData.email, verificationData.password);
+
+            // Create user in db
+            const user = await accountService.registerFamilyMember({ ...verificationData, cognitoSub });
+
+            return {
+                blocked: false,
+                user
+            };
         };
+
+        if (verificationData.flow === "forgot-password") {
+            await awsService.setCognitoUserPassword(verificationData.email, verificationData.password);
+
+            return {
+                blocked: false
+            };
+        }
     };
 }

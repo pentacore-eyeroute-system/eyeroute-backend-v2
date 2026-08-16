@@ -1,4 +1,5 @@
 import { AuthOrchestratorService } from "../services/authOrchestratorService.js";
+import { signUpOtpSchema, forgotPasswordOtpSchema } from "../validation/userValidation.js";
 
 const authOrchestratorService = new AuthOrchestratorService();
 
@@ -27,9 +28,35 @@ export class AuthController {
 
     verifyOtp = async (req, res) => {
         try {
+            let parsedData;
+
+            if (req.body.flow === 'sign-up') {
+                parsedData = signUpOtpSchema.safeParse({
+                    ...req.body,
+                });
+            } 
+            else if (req.body.flow === 'forgot-password') {
+                parsedData = forgotPasswordOtpSchema.safeParse({
+                    ...req.body,
+                });
+            } 
+            else {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Invalid verification flow.'
+                });
+            }
+
+            if (!parsedData.success) {
+                return res.status(400).json({
+                    success: false,
+                    error: parsedData.error.flatten().fieldErrors
+                });
+            }
+
             const verificationData = {
-                email: req.body.email,
-                otp: String(req.body.otp),
+                ...parsedData.data,
+                flow: req.body.flow // "sign-up" or "forgot-password"
             }
 
             const result = await authOrchestratorService.verifyOtp(verificationData);
