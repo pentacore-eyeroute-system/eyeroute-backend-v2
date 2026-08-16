@@ -19,14 +19,6 @@ export const NavigationRoute = sequelize.define(
             defaultValue: 'active',
             allowNull: false,
         },
-        nav_started_at : {
-            type: DataTypes.DATE,
-            allowNull: false,
-        },
-        nav_completed_at : {
-            type: DataTypes.DATE,
-            allowNull: true,
-        },
         nav_cancelled_at : {
             type: DataTypes.DATE,
             allowNull: true,

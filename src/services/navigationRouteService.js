@@ -8,7 +8,6 @@ export class NavigationRouteService {
             nav_linked_active_wearable_id: navigationData.activeWearableId,
             nav_destination_name: navigationData.destinationName,
             nav_status: navigationData.status,
-            nav_started_at: navigationData.startedAt,
         });
     };
 
@@ -62,7 +61,6 @@ export class NavigationRouteService {
     async updateNavigationStatus(navigationRouteId, navigationData) {
         await NavigationRoute.update({
             nav_status: navigationData.status,
-            nav_completed_at: navigationData.completedAt,
             nav_cancelled_at: navigationData.cancelledAt,
         }, { where : { 
                 id : navigationRouteId
