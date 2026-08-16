@@ -22,6 +22,11 @@ export class NavigationRouteService {
         return navigationRouteRecord;
     };
 
+    async getAllRoutesWithDestination() {
+        
+    };
+
+
     async updateNavigationStatus(navigationRouteId, navigationData) {
         await NavigationRoute.update({
             nav_status: navigationData.status,

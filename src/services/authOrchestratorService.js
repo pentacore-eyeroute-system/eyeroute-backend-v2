@@ -34,7 +34,7 @@ export class AuthOrchestratorService {
         const hashedOtp = await otpUtil.hashOtp(otp);
 
         // Store otp
-        await otpVerificationService.storeOtp({
+        const otpRecord = await otpVerificationService.storeOtp({
             ...otpData,
             hashedOtp
         });
@@ -44,6 +44,11 @@ export class AuthOrchestratorService {
 
         // Send otp through email
         await awsService.sendEmail(otpData.email, subject, body);
+
+        // Sends ovr expires at 
+        return { 
+            ovr_expires_at: otpRecord.ovr_expires_at
+        }
     };
 
     async verifyOtp(verificationData) {
@@ -83,7 +88,10 @@ export class AuthOrchestratorService {
 
                 await otpVerificationService.updateAttemptsAndBlockedTime(otpRecord, NEW_ATTEMPTS, BLOCKED_UNTIL);
 
-                throw new Error('Too many attempts. Try again later.');
+                return {
+                    blocked: true,
+                    ovr_blocked_until: BLOCKED_UNTIL
+                };
             }  
 
             await otpVerificationService.updateAttemptsAndBlockedTime(otpRecord, NEW_ATTEMPTS, null);
@@ -93,5 +101,9 @@ export class AuthOrchestratorService {
         
         // Update is used if valid otp
         await otpVerificationService.updateIsUsed(otpRecord, true);
+
+        return {
+            blocked: false
+        };
     };
 }
