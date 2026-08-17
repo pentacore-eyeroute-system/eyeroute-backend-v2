@@ -23,8 +23,9 @@ export class AuthOrchestratorService {
 
             // Note: ovr_is_used won't be checked to allow new otp request when account with the same email gets deleted
 
-            // Check if otp is still valid
-            if (new Date() < existingOtpRecord.ovr_expires_at) {
+            // Prevent requesting new otp if the existing otp is still unused AND still valid (haven't expired yet)
+            if (!existingOtpRecord.ovr_is_used &&
+                new Date() < existingOtpRecord.ovr_expires_at) {
                 throw new Error('Please wait before requesting a new OTP.')
             }
         }
