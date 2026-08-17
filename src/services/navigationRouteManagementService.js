@@ -56,7 +56,7 @@ export class NavigationRouteManagementService {
             throw new Error('No active navigation found');
         }
 
-        // Update navigation route status and completed/ cancelled timestamp
+        // Update navigation route status
         await navigationRouteService.updateNavigationStatus(navigationRoute.id, navigationData);        
     };
 

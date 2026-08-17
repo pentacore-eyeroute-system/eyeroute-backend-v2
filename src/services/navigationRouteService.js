@@ -61,7 +61,6 @@ export class NavigationRouteService {
     async updateNavigationStatus(navigationRouteId, navigationData) {
         await NavigationRoute.update({
             nav_status: navigationData.status,
-            nav_cancelled_at: navigationData.cancelledAt,
         }, { where : { 
                 id : navigationRouteId
             }

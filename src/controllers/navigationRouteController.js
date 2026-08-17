@@ -49,7 +49,6 @@ export class NavigationRouteController {
             const iotSerialNumber = req.params.serialNumber;
             const navigationData = {
                 status: req.body.status,
-                cancelledAt: req.body.cancelledAt,
             }
 
             await navigationRouteManagementService.updateNavigationStatus(iotSerialNumber, navigationData);
