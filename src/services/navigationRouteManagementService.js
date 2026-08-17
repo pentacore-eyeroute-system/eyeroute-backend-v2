@@ -22,7 +22,15 @@ export class NavigationRouteManagementService {
             throw new Error('Device not yet activated');
         }
 
-        // Creates navigation route record
+        // Checks if there is an active navigation associated to active wearable id
+        const activeNavigation = await navigationRouteService.checksActiveNavigation(activeWearable.id);
+
+        if (activeNavigation) {
+            // If active navigation exists, override it
+            const updateNavigationStatus = await navigationRouteService.updateNavigationStatus(activeNavigation.id, { status : "overridden" });
+        }
+
+        // Creates new navigation route record
         await navigationRouteService.addNavigationRoute({ ...navigationData, activeWearableId: activeWearable.id});
     };
 

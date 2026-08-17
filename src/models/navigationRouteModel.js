@@ -15,7 +15,7 @@ export const NavigationRoute = sequelize.define(
             allowNull: false,
         },
         nav_status: {
-            type: DataTypes.ENUM('active', 'completed', 'cancelled'),
+            type: DataTypes.ENUM('active', 'completed', 'overriden'),
             defaultValue: 'active',
             allowNull: false,
         },
