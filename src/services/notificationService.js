@@ -15,8 +15,13 @@ export class NotificationService {
         return notification;
     };
 
-    async getNotifications(userId) {
+    async getNotifications(userId, page, limit) {
+        const offset = (page - 1) * limit;
+
         const notifications = await Notification.findAll({
+            order: [
+                ['createdAt', 'DESC']
+            ],
             include: [
                 {
                     model: ActiveIoTWearable,
@@ -39,10 +44,17 @@ export class NotificationService {
                     model: NotificationType,
                     required: true,
                 }
-            ]
+            ],
+            limit : limit + 1,
+            offset : offset
         });
 
-        return notifications;
+        const hasNextPage = notifications.length > limit;
+
+        return {
+            notifications : notifications.slice(0, limit),
+            hasNextPage
+        };
     };
 
     async updateIsReadStatus(ntfId) {

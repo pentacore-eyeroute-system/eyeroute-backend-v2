@@ -28,8 +28,10 @@ export class NotificationController {
     getNotificationsByUser = async (req, res) => {
         try {
             const cognitoSub = req.user.sub;
+            const page = Math.max(parseInt(req.query.page) || 1, 1);
+            const limit = Math.min(parseInt(req.query.limit) || 10, 10);
 
-            const result = await notificationManagementService.getNotificationsByUser(cognitoSub);
+            const result = await notificationManagementService.getNotificationsByUser(cognitoSub, page, limit);
 
             res.status(200).json({
                 success: true,

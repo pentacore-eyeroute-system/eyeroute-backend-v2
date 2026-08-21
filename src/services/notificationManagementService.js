@@ -96,16 +96,17 @@ export class NotificationManagementService {
         };
     };
 
-    async getNotificationsByUser(cognitoSub) {
+    async getNotificationsByUser(cognitoSub, page, limit) {
         const user = await userService.getFamilyMember(cognitoSub);
 
         if (!user) {
             throw new Error('User not found');
         }
 
-        const notifications = await notificationService.getNotifications(user.id);
+        const result = await notificationService.getNotifications(user.id, page, limit);
 
-        return notifications.map(notification => ({
+        return {
+            notifications : result.notifications.map(notification => ({
                 id: notification.id,
                 pvi_id: notification.ActiveIoTWearable.PVI.id,
                 pvi_first_name: notification.ActiveIoTWearable.PVI.pvi_first_name,
@@ -113,8 +114,10 @@ export class NotificationManagementService {
                 notification_description: notification.NotificationType.ntt_description,
                 notification_is_read: notification.ntf_is_read,
                 notification_timestamp: notification.createdAt,
-            })
-        );
+                })
+            ),
+            hasNextPage: result.hasNextPage
+        }
     };
 
     async updateNotificationIsReadStatus(ntfId) {
