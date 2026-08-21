@@ -9,5 +9,4 @@ import './notificationModel.js';
 import './locationModel.js';
 import './streamModel.js';
 import './otpVerificationModel.js';
-import './navigationRouteModel.js';
 import './trackingRouteModel.js';

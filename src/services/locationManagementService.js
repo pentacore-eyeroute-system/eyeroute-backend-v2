@@ -2,17 +2,13 @@ import { ActiveIoTWearableService } from "./activeIoTWearableService.js";
 import { LocationService } from "./locationService.js";
 import { IoTWearableService } from "./ioTWearableService.js";
 import { getLocationWebSocket } from "../websockets/index.js";
-import { NavigationRouteService } from "./navigationRouteService.js";
 import { TrackingRouteService } from "./trackingRouteService.js";
-import { IoTStateService } from "./iotStateService.js";
 import { GpsUtil } from "../utils/gpsUtil.js";
 
 const activeWearableService = new ActiveIoTWearableService();
 const locationService = new LocationService();
 const iotWearableService = new IoTWearableService();
-const navigationRouteService = new NavigationRouteService();
 const trackingRouteService = new TrackingRouteService();
-const iotStateService = new IoTStateService();
 const gpsUtil = new GpsUtil();
 
 export class LocationManagementService {
