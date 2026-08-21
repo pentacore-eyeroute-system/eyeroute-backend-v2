@@ -6,8 +6,10 @@ export class RouteHistoryController {
     getRouteHistory = async (req, res) => {
         try {
             const pviId = req.params.id;
+            const page = Math.max(parseInt(req.query.page) || 1, 1);
+            const limit = Math.min(parseInt(req.query.limit) || 5, 5);
 
-            const result = await routeHistoryManagementService.getRouteHistory(pviId);
+            const result = await routeHistoryManagementService.getRouteHistory(pviId, page, limit);
 
             res.status(200).json({
                 success : true,

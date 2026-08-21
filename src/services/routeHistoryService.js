@@ -2,7 +2,9 @@ import { TrackingRoute } from "../models/trackingRouteModel.js";
 import { Location } from "../models/locationModel.js";
 
 export class RouteHistoryService {
-    async getRouteHistory(linkedActiveWearableId) {
+    async getRouteHistory(linkedActiveWearableId, page, limit) {
+        const offset = (page - 1) * limit;
+
         const routes = await TrackingRoute.findAll({
             where: {
                 trk_linked_active_wearable_id : linkedActiveWearableId,
@@ -22,10 +24,16 @@ export class RouteHistoryService {
                     'loc_recorded_at',
                     'ASC'
                 ]
-            ]
+            ],
+            limit : limit + 1,
+            offset : offset
         });
 
-        return routes.map(route => {
+        const hasNextPage = routes.length > limit;
+
+        const paginatedRoutes = routes.slice(0, limit);
+
+        const routeHistory = paginatedRoutes.map(route => {
             const locations = route.locationCoordinates;
             
             const startedAt = locations[0]?.loc_recorded_at ?? null;
@@ -88,5 +96,10 @@ export class RouteHistoryService {
                 location
             };
         });
+
+        return {
+            routeHistory,
+            hasNextPage
+        }
     };
 }
