@@ -28,6 +28,12 @@ export class ActiveIoTWearableService {
         return activeIoTWearable;
     };
 
+    async findById(activeWearableId) {
+        const activeIoTWearable = await ActiveIoTWearable.findByPk(activeWearableId);
+
+        return activeIoTWearable;
+    };
+
     async updateBatteryLevelAndStatus(iotWearableId, activeIotData,) {
         const activeIoTWearable = await ActiveIoTWearable.findOne({ where: { act_linked_wearable_id : iotWearableId } });
 

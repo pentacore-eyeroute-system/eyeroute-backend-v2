@@ -11,6 +11,7 @@ import { NewsPictures } from "./newsPictureModel.js";
 import { Gallery } from "./galleryModel.js";
 import { GalleryPicture } from "./galleryPictureModel.js";
 import { NavigationRoute } from "./navigationRouteModel.js";
+import { TrackingRoute } from "./trackingRouteModel.js";
 
 FamilyMember.hasMany(FamilyPviLink, {
     foreignKey: 'relative_linked_fam_id',
@@ -91,4 +92,13 @@ NavigationRoute.hasMany(Location, {
 
 Location.belongsTo(NavigationRoute, {
     foreignKey: 'loc_linked_navigation_route_id',
+});
+
+TrackingRoute.hasMany(Location, {
+    foreignKey: 'loc_linked_tracking_route_id',
+    as: 'locationCoordinates',
+});
+
+Location.belongsTo(TrackingRoute, {
+    foreignKey: 'loc_linked_tracking_route_id',
 });

@@ -25,11 +25,11 @@ export const Location = sequelize.define(
       type: DataTypes.DATE,
       allowNull: false,
     },
-    loc_linked_navigation_route_id: {
+    loc_linked_tracking_route_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: "navigation_routes",
+        model: "tracking_routes",
         key: "id",
       }
     },

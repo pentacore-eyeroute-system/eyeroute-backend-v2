@@ -3,11 +3,13 @@ import { ActiveIoTWearableService } from '../services/activeIoTWearableService.j
 import { IoTWearableService } from '../services/ioTWearableService.js';
 import { IoTStateService } from '../services/iotStateService.js'
 import { NotificationManagementService } from '../services/notificationManagementService.js';
+import { TrackingRouteService } from '../services/trackingRouteService.js';
 
 const activeWearableService = new ActiveIoTWearableService();
 const iotWearableService = new IoTWearableService();
 const iotStateService = new IoTStateService();
 const notificationManagementService = new NotificationManagementService();
+const trackingRouteService = new TrackingRouteService();
 
 export function startIotStatusCron() {
     // Checks updatedAt column in active iot wearables table every 1 minute real-time
@@ -30,6 +32,21 @@ export function startIotStatusCron() {
             // Checks if lastest updatedAt timestamp is more than 2 minutes 
             if (NOW - lastSeenAt > OFFLINE_MINUTES_THRESHOLD) {
                 newStatus = 'Offline';
+
+                // Finds active tracking route
+                const activeTrackingRoute = await trackingRouteService.checksActiveTracking(activeIoTWearable.id);
+
+                if (!activeTrackingRoute) {
+                    throw new Error('No active trackking route found');
+                }
+
+                const trackingData = {
+                    id : activeTrackingRoute.id,
+                    status : "completed"
+                }
+
+                // Ends active tracking route when iot goes offline
+                await trackingRouteService.updateTrackingStatus(trackingData);
             }
 
             if (activeIoTWearable.act_status !== newStatus) {

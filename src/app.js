@@ -27,6 +27,6 @@ app.use('/api/stream', streamRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/navigation', navigationRoutes);
+app.use('/api/route-history', navigationRoutes);
 
 export default app;
