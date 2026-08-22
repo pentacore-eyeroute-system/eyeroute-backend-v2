@@ -1,5 +1,7 @@
 import { FamilyPviLink } from "./familyPviLinkModel.js";
 import { FamilyMember } from "./familyMemberModel.js";
+// FCM: added for push notifications.
+import { DeviceToken } from "./deviceTokenModel.js";
 import { PVI } from "./personWithVisualImpairmentModel.js";
 import { IoTWearable } from "./iotWearableModel.js";
 import { ActiveIoTWearable } from "./activeIoTWearableModel.js";
@@ -14,6 +16,15 @@ import { TrackingRoute } from "./trackingRouteModel.js";
 
 FamilyMember.hasMany(FamilyPviLink, {
     foreignKey: 'relative_linked_fam_id',
+});
+
+// FCM: a family member's registered devices, for push notifications.
+FamilyMember.hasMany(DeviceToken, {
+    foreignKey: 'dvt_linked_fam_id',
+});
+
+DeviceToken.belongsTo(FamilyMember, {
+    foreignKey: 'dvt_linked_fam_id',
 });
 
 FamilyPviLink.belongsTo(FamilyMember, {

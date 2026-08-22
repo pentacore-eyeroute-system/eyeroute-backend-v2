@@ -32,5 +32,17 @@ export default {
     },
     ses: {
         sesFromEmail: process.env.SES_FROM_EMAIL,
+    },
+    /*
+        FCM: added for push notifications. Values come from the Firebase service
+        account JSON. When any of them is missing the push service disables
+        itself and the backend behaves exactly as it did before FCM was added.
+        FIREBASE_PRIVATE_KEY keeps its newlines as literal "
+" sequences.
+    */
+    fcm: {
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY,
     }
 }

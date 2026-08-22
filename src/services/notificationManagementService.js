@@ -6,6 +6,11 @@ import { NotificationTypeService } from "./notificationTypeService.js";
 import { IoTWearableService } from "./ioTWearableService.js";
 import { ActiveIoTWearableService } from "./activeIoTWearableService.js";
 import { getNotificationWebSocket } from "../websockets/index.js";
+// FCM: added so a recorded notification is also pushed to devices whose
+// app is backgrounded or closed (the websocket above only reaches a
+// running, connected app).
+import { FcmService } from "./fcmService.js";
+import { DeviceTokenService } from "./deviceTokenService.js";
 
 const userService = new FamilyMemberService();
 const userPviLinkService = new FamilyPviLinkService();
@@ -14,6 +19,9 @@ const notificationService = new NotificationService();
 const notificationTypeService = new NotificationTypeService();
 const iotWearableService = new IoTWearableService();
 const activeIoTWearableService = new ActiveIoTWearableService();
+// FCM: added for push notifications.
+const fcmService = new FcmService();
+const deviceTokenService = new DeviceTokenService();
 
 export class NotificationManagementService {
     async recordNewNotification(iotSerialNumber, iotWearableData) {
@@ -92,6 +100,38 @@ export class NotificationManagementService {
                 notificationWS.broadcastNotification(notificationToSend, iotWearable.id); // notification record from db is sent along with id
             } else {
                 console.error('WebSocket not initialized');
+            }
+
+            /*
+                FCM: added for push notifications.
+
+                Delivers the same notification to the OS of every device
+                belonging to the family members linked to this PVI, which is what
+                reaches them while the app is backgrounded or closed.
+
+                Deliberately awaited but never allowed to throw: the notification
+                is already stored and broadcast, so a Firebase problem must not
+                fail the IoT device's request.
+            */
+            try {
+                const deviceTokens = await deviceTokenService.findTokensByPviId(pvi.id);
+
+                if (deviceTokens.length > 0) {
+                    const { invalidTokens } = await fcmService.sendToTokens(deviceTokens, {
+                        title : notificationType.ntt_title,
+                        body  : `${pvi.pvi_first_name}: ${notificationType.ntt_description}`,
+                        data  : {
+                            notification_id   : String(notification.id),
+                            notification_type : String(notification.ntf_linked_notification_type_id),
+                            pvi_id            : String(pvi.id),
+                        },
+                    });
+
+                    // Stops dead tokens from being retried on every notification.
+                    await deviceTokenService.removeTokens(invalidTokens);
+                }
+            } catch (err) {
+                console.error('FCM: push notification step failed:', err.message);
             }
         };
     };

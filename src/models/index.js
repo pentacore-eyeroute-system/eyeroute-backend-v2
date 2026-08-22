@@ -10,3 +10,5 @@ import './locationModel.js';
 import './streamModel.js';
 import './otpVerificationModel.js';
 import './trackingRouteModel.js';
+// FCM: added so sync() creates the device_tokens table.
+import './deviceTokenModel.js';
