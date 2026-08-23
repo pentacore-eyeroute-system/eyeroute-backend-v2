@@ -1,13 +1,13 @@
 import { FamilyMember } from "../models/familyMemberModel.js";
 
 export class FamilyMemberService {
-    async createFamilyMember(data) {
+    async createFamilyMember(data, options = {}) {
         const familyMember = await FamilyMember.create({
             fam_cognito_sub : data.cognitoSub,
             fam_first_name  : data.famFirstname,
             fam_last_name   : data.famLastname,
             fam_gender      : data.famGender,
-        });
+        }, options);
 
         return familyMember.id;
     };

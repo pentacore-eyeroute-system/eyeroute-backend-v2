@@ -11,6 +11,7 @@ import { getNotificationWebSocket } from "../websockets/index.js";
 // running, connected app).
 import { FcmService } from "./fcmService.js";
 import { DeviceTokenService } from "./deviceTokenService.js";
+import { sequelize } from "../config/db.js";
 
 const userService = new FamilyMemberService();
 const userPviLinkService = new FamilyPviLinkService();
@@ -32,108 +33,130 @@ export class NotificationManagementService {
             DISCONNECTED: 3,
         };
 
-        // Finds iot record based from given serial number
-        const iotWearable = await iotWearableService.findIotBySerialNumber(iotSerialNumber);
+        const transaction = await sequelize.transaction();
+        try {
+            // Finds iot record based from given serial number
+            const iotWearable = await iotWearableService.findIotBySerialNumber(iotSerialNumber);
 
-        if (!iotWearable) {
-            throw new Error('Device not found')
-        }
+            if (!iotWearable) {
+                throw new Error('Device not found')
+            }
 
-        // Finds active iot record based from iot id
-        const activeIoTWearable = await activeIoTWearableService.findByWearableId(iotWearable.id);
+            // Finds active iot record based from iot id
+            const activeIoTWearable = await activeIoTWearableService.findByWearableId(iotWearable.id);
 
-        // Sets incomplete notification data to store in db
-        const baseNotificationData = {
-            linkedActiveWearableId : activeIoTWearable.id,
-            isRead : false,
-        };
-
-        // Collects all notifications first to store in db
-        const notificationsToStore = [];
-
-        // Checks iot battery level
-        if (iotWearableData.batteryLevel <= LOW_BATTERY_LEVEL) {
-            notificationsToStore.push({
-                ...baseNotificationData,
-                linkedNotificationTypeId : NOTIFICATION_TYPES_ID.LOW_BATTERY
-            });
-        }
-
-        // Checks iot status
-        if (iotWearableData.status === 'Online') {
-            notificationsToStore.push({
-                ...baseNotificationData,
-                linkedNotificationTypeId : NOTIFICATION_TYPES_ID.CONNECTED
-            });
-        } else {
-            notificationsToStore.push({
-                ...baseNotificationData,
-                linkedNotificationTypeId : NOTIFICATION_TYPES_ID.DISCONNECTED
-            });
-        }
-
-        // Calls notification websocket instantiation
-        const notificationWS = getNotificationWebSocket();
-
-        // Loops notifications individually before storing in db
-        for (let i = 0; i < notificationsToStore.length; i++) {
-            // Stores notification data in db
-            const notification = await notificationService.recordNewNotification(notificationsToStore[i]);
-
-            // Retrieves notification details like title and description given notification_type id
-            const notificationType = await notificationTypeService.findNotificationTypeById(notification.ntf_linked_notification_type_id);
-
-            // Finds pvi associated to active iot wearable 
-            const pvi = await pviService.findByPviId(activeIoTWearable.act_linked_pvi_id);
-
-            const notificationToSend = {
-                id                       : notification.id,
-                pvi_first_name           : pvi.pvi_first_name, // use pvi first name to know which notification belongs to whom
-                notification_title       : notificationType.ntt_title,
-                notification_description : notificationType.ntt_description,
-                notification_is_read     : notification.ntf_is_read,
-                notification_timestamp   : notification.createdAt,
+            // Sets incomplete notification data to store in db
+            const baseNotificationData = {
+                linkedActiveWearableId : activeIoTWearable.id,
+                isRead : false,
             };
 
-            // Sends latest notification to location notification for real-time updates
-            if (notificationWS) {
-                notificationWS.broadcastNotification(notificationToSend, iotWearable.id); // notification record from db is sent along with id
+            // Collects all notifications first to store in db
+            const notificationsToStore = [];
+
+            // Checks iot battery level
+            if (iotWearableData.batteryLevel <= LOW_BATTERY_LEVEL) {
+                notificationsToStore.push({
+                    ...baseNotificationData,
+                    linkedNotificationTypeId : NOTIFICATION_TYPES_ID.LOW_BATTERY
+                });
+            }
+
+            // Checks iot status
+            if (iotWearableData.status === 'Online') {
+                notificationsToStore.push({
+                    ...baseNotificationData,
+                    linkedNotificationTypeId : NOTIFICATION_TYPES_ID.CONNECTED
+                });
             } else {
-                console.error('WebSocket not initialized');
+                notificationsToStore.push({
+                    ...baseNotificationData,
+                    linkedNotificationTypeId : NOTIFICATION_TYPES_ID.DISCONNECTED
+                });
             }
 
-            /*
-                FCM: added for push notifications.
+            const notificationsToSend = [];
 
-                Delivers the same notification to the OS of every device
-                belonging to the family members linked to this PVI, which is what
-                reaches them while the app is backgrounded or closed.
+            // Loops notifications individually before storing in db
+            for (let i = 0; i < notificationsToStore.length; i++) {
+                // Stores notification data in db
+                const notification = await notificationService.recordNewNotification(notificationsToStore[i], { transaction });
 
-                Deliberately awaited but never allowed to throw: the notification
-                is already stored and broadcast, so a Firebase problem must not
-                fail the IoT device's request.
-            */
-            try {
-                const deviceTokens = await deviceTokenService.findTokensByPviId(pvi.id);
+                // Retrieves notification details like title and description given notification_type id
+                const notificationType = await notificationTypeService.findNotificationTypeById(notification.ntf_linked_notification_type_id);
 
-                if (deviceTokens.length > 0) {
-                    const { invalidTokens } = await fcmService.sendToTokens(deviceTokens, {
-                        title : notificationType.ntt_title,
-                        body  : `${pvi.pvi_first_name}: ${notificationType.ntt_description}`,
-                        data  : {
-                            notification_id   : String(notification.id),
-                            notification_type : String(notification.ntf_linked_notification_type_id),
-                            pvi_id            : String(pvi.id),
-                        },
-                    });
+                // Finds pvi associated to active iot wearable 
+                const pvi = await pviService.findByPviId(activeIoTWearable.act_linked_pvi_id);
 
-                    // Stops dead tokens from being retried on every notification.
-                    await deviceTokenService.removeTokens(invalidTokens);
+                const notificationToSend = {
+                    id                       : notification.id,
+                    pvi_first_name           : pvi.pvi_first_name, // use pvi first name to know which notification belongs to whom
+                    notification_title       : notificationType.ntt_title,
+                    notification_description : notificationType.ntt_description,
+                    notification_is_read     : notification.ntf_is_read,
+                    notification_timestamp   : notification.createdAt,
+                };
+
+                notificationsToSend.push({
+                    data: notificationToSend,
+                    iotWearableId: iotWearable.id,
+                    pviId: pvi.id,
+                    title: notificationType.ntt_title,
+                    body: `${pvi.pvi_first_name}: ${notificationType.ntt_description}`,
+                    notificationId: notification.id,
+                    notificationTypeId: notification.ntf_linked_notification_type_id,
+                });
+            }
+
+            await transaction.commit();
+
+            // Calls notification websocket instantiation
+            const notificationWS = getNotificationWebSocket();
+
+            for (const item of notificationsToSend) {
+                // Sends latest notification to location notification for real-time updates
+                if (notificationWS) {
+                    notificationWS.broadcastNotification(item.data, item.iotWearableId); // notification record from db is sent along with id
+                } else {
+                    console.error('WebSocket not initialized');
                 }
-            } catch (err) {
-                console.error('FCM: push notification step failed:', err.message);
+
+                /*
+                    FCM: added for push notifications.
+
+                    Delivers the same notification to the OS of every device
+                    belonging to the family members linked to this PVI, which is what
+                    reaches them while the app is backgrounded or closed.
+
+                    Deliberately awaited but never allowed to throw: the notification
+                    is already stored and broadcast, so a Firebase problem must not
+                    fail the IoT device's request.
+                */
+                try {
+                    const deviceTokens = await deviceTokenService.findTokensByPviId(item.pviId);
+
+                    if (deviceTokens.length > 0) {
+                        const { invalidTokens } = await fcmService.sendToTokens(deviceTokens, {
+                            title : item.title,
+                            body  : item.body,
+                            data  : {
+                                notification_id   : String(item.notificationId),
+                                notification_type : String(item.notificationTypeId),
+                                pvi_id            : String(item.pviId),
+                            },
+                        });
+
+                        // Stops dead tokens from being retried on every notification.
+                        await deviceTokenService.removeTokens(invalidTokens);
+                    }
+                } catch (err) {
+                    console.error('FCM: push notification step failed:', err.message);
+                }
             }
-        };
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
     };
 
     async getNotificationsByUser(cognitoSub, page, limit) {

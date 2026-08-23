@@ -5,12 +5,12 @@ import { PVI } from "../models/personWithVisualImpairmentModel.js";
 import { FamilyPviLink } from "../models/familyPviLinkModel.js";
 
 export class NotificationService {
-    async recordNewNotification(notificationData) {
+    async recordNewNotification(notificationData, options = {}) {
         const notification = await Notification.create({
             ntf_linked_active_wearable_id : notificationData.linkedActiveWearableId,
             ntf_linked_notification_type_id : notificationData.linkedNotificationTypeId,
             ntf_is_read : notificationData.isRead,
-        });
+        }, options);
 
         return notification;
     };

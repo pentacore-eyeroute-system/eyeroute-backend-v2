@@ -94,11 +94,11 @@ export class DeviceTokenService {
         registration). Without this the same failures are retried on every
         notification forever.
     */
-    async removeTokens(tokens) {
+    async removeTokens(tokens, options = {}) {
         if (!tokens || tokens.length === 0) {
             return 0;
         }
-
-        return DeviceToken.destroy({ where: { dvt_token: tokens } });
+ 
+        return DeviceToken.destroy({ where: { dvt_token: tokens }, ...options });
     };
 }

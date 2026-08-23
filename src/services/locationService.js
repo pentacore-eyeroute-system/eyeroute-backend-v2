@@ -1,14 +1,14 @@
 import { Location } from "../models/locationModel.js";
 
 export class LocationService {
-    async pushLatestLocation(activeWearableId, iotLatestCoordinates, linkedTrackingRouteId,) {
+    async pushLatestLocation(activeWearableId, iotLatestCoordinates, linkedTrackingRouteId, options = {}) {
         await Location.create({
             loc_linked_active_wearable_id: activeWearableId,
             loc_latitude: iotLatestCoordinates.latitude,
             loc_longitude: iotLatestCoordinates.longitude,
             loc_recorded_at: iotLatestCoordinates.timestamp,
             loc_linked_tracking_route_id: linkedTrackingRouteId,
-        });
+        }, options);
     };
 
     async getLatestLocation(activeWearableId) {
@@ -46,7 +46,7 @@ export class LocationService {
         });
     };
 
-    async updateLocationTrackingRouteId(locationId, linkedTrackingRouteId) {
+    async updateLocationTrackingRouteId(locationId, linkedTrackingRouteId, options = {}) {
         await Location.update(
             {
                 loc_linked_tracking_route_id: linkedTrackingRouteId
@@ -54,7 +54,8 @@ export class LocationService {
             {
                 where: {
                     id: locationId
-                }
+                },
+                ...options
             }
         );
     };

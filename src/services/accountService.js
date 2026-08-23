@@ -9,8 +9,8 @@ const familyPviLinkService = new FamilyPviLinkService();
 const awsService = new AwsService();
 
 export class AccountService {
-    async registerFamilyMember(famData) {
-        const familyMemberId = await familyMemberService.createFamilyMember(famData);
+    async registerFamilyMember(famData, options = {}) {
+        const familyMemberId = await familyMemberService.createFamilyMember(famData, options);
 
             return {
                 id : familyMemberId
