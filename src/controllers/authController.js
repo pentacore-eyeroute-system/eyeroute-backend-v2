@@ -8,6 +8,7 @@ export class AuthController {
         try {
             const otpData = {
                 email : req.body.email,
+                flow: req.body.flow, // either sign-up or null
                 expiresAt: new Date(Date.now() + 5 * 60 * 1000) // 5 minutes,
             };
 

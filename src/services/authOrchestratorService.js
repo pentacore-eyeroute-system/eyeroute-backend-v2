@@ -14,6 +14,15 @@ export class AuthOrchestratorService {
     async initiateOtp(otpData) {
         const transaction = await sequelize.transaction();
         try {
+            // Check if email is already used (for signup only)
+            const emailExists = await awsService.checkEmailExists(otpData.email);
+
+            if (otpData.flow === 'sign-up' &&
+                emailExists
+            ) {
+                throw new Error('Email is already registered.');
+            }
+
             // Retrieve latest otp record associated to recipient's email
             const existingOtpRecord = await otpVerificationService.findByEmail(otpData.email);
 

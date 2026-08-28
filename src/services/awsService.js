@@ -1,6 +1,6 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { CognitoIdentityProviderClient, AdminCreateUserCommand, AdminSetUserPasswordCommand, AdminDeleteUserCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoIdentityProviderClient, AdminCreateUserCommand, AdminSetUserPasswordCommand, AdminDeleteUserCommand, ListUsersCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { v4 as uuidv4 } from 'uuid';
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import config from '../config/env.js';
@@ -84,6 +84,20 @@ export class AwsService {
 
         return url;
     }; 
+
+    async checkEmailExists(email) {
+        const command = new ListUsersCommand({
+            UserPoolId: COGNITO_USER_POOL_ID,
+            Filter: `email = "${email}"`,
+            Limit: 1
+        });
+
+        const result = await cognitoClient.send(command);
+
+        const emailExists = result.Users.length > 0;
+
+        return emailExists;
+    }
 
     async createCognitoUser(email) {
         const command = new AdminCreateUserCommand({
