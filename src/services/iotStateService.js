@@ -1,9 +1,11 @@
 import { ActiveIoTWearableService } from "./activeIoTWearableService.js";
 import { IoTWearableService } from "./ioTWearableService.js";
 import { getIoTStateWebSocket } from "../websockets/index.js";
+import { NotificationManagementService } from "./notificationManagementService.js";
 
 const activeIoTWearableService = new ActiveIoTWearableService();
 const iotWearableService = new IoTWearableService();
+const notificationManagementService = new NotificationManagementService();
 
 export class IoTStateService {
     async getBatteryLevelAndStatus(pviId) {
@@ -32,8 +34,8 @@ export class IoTStateService {
             throw new Error('Device not found')
         }
 
-        // Finds active iot associated to iot record, and updates battery level and status
-        await activeIoTWearableService.updateBatteryLevelAndStatus(iotWearable.id, iotWearableData);
+        // Checks transitions, records notifications if needed, and updates battery level and status in the DB
+        await notificationManagementService.recordNewNotification(iotSerialNumber, iotWearableData);
 
         // Sends latest iot battery level and status to iot state websocket for real-time updates
         const iotWS = getIoTStateWebSocket();

@@ -2,13 +2,11 @@ import cron from 'node-cron';
 import { ActiveIoTWearableService } from '../services/activeIoTWearableService.js';
 import { IoTWearableService } from '../services/ioTWearableService.js';
 import { IoTStateService } from '../services/iotStateService.js'
-import { NotificationManagementService } from '../services/notificationManagementService.js';
 import { TrackingRouteService } from '../services/trackingRouteService.js';
 
 const activeWearableService = new ActiveIoTWearableService();
 const iotWearableService = new IoTWearableService();
 const iotStateService = new IoTStateService();
-const notificationManagementService = new NotificationManagementService();
 const trackingRouteService = new TrackingRouteService();
 
 export function startIotStatusCron() {
@@ -54,13 +52,9 @@ export function startIotStatusCron() {
                     status: newStatus 
                 };
 
-                // Stores new status on active iot wearables db
-                // Sends new status to iot state websocket
+                // Stores new status on active iot wearables db, records transition notifications,
+                // and sends new status to iot state websocket
                 await iotStateService.updateBatteryLevelAndStatus(iotWearable.wearable_serial_number, wearableData);
-
-                // Stores new notification record based on status in notifications db
-                // Sends new notification to notification websocket
-                await notificationManagementService.recordNewNotification(iotWearable.wearable_serial_number, wearableData);
             }
         }
 
