@@ -75,8 +75,16 @@ export class AccountService {
             if (!familyMember) {
                 throw new Error('User not found');
             }
-            
-            await familyPviLinkService.softDeleteFamilyPviLink(familyMember.id, { transaction });
+
+            const linkedPvis = await familyPviLinkService.findByFamId(familyMember.id);
+
+            if (linkedPvis) {
+                for (let i = 0; i < linkedPvis.length; i++) {
+                    const pvi = linkedPvis[i];
+
+                    await familyPviLinkService.softDeleteFamilyPviLink(familyMember.id, pvi.relative_linked_pvi_id, { transaction });
+                }
+            }         
 
             await familyMemberService.softDeleteFamilyMember(cognitoSub, { transaction });
 
