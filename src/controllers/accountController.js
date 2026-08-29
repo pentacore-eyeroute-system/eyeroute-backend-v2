@@ -1,133 +1,157 @@
 import { AccountService } from "../services/accountService.js";
+/*
+    FIX: updateFamilyMemberInfo below calls userSchema.safeParse() but this
+    import was missing, so the name was undefined at runtime. Every
+    PUT /account/update-fam-member-info threw "ReferenceError: userSchema is not
+    defined", the handler's catch turned it into a 500, and profile edits never
+    reached the database — the app reported success because it treated any
+    failed response as the unchanged user.
+*/
+import { userSchema } from "../validation/userValidation.js";
 
 const accountService = new AccountService();
 
 export class AccountController {
-    registerFamilyMember = async (req, res) => {
-        try {
-            const cognitoSub = req.user.sub;
-            const userData = {
-                famFirstname: req.body.famFirstname,
-                famLastname: req.body.famLastname,
-                famGender: req.body.famGender,
-            };
+  registerFamilyMember = async (req, res) => {
+    try {
+      const cognitoSub = req.user.sub;
 
-            const result = await accountService.registerFamilyMember({ ...userData, cognitoSub });
+      const userData = {
+        famFirstname: req.body.famFirstname,
+        famLastname: req.body.famLastname,
+        famGender: req.body.famGender,
+      };
 
-            res.status(201).json({
-                success: true,
-                message : 'Register successful',
-                result
-            });
-        } catch (err) {
-            res.status(500).json({
-                sucess: false,
-                error : err.message
-            });
-        }
-    };
+      const result = await accountService.registerFamilyMember({
+        ...userData,
+        cognitoSub,
+      });
 
-    getFamilyMemberInfo = async (req, res) => {
-        try {
-            const cognitoSub = req.user.sub;
+      res.status(201).json({
+        success: true,
+        message: "Register successful",
+        result,
+      });
+    } catch (err) {
+      res.status(500).json({
+        sucess: false,
+        error: err.message,
+      });
+    }
+  };
 
-            const result = await accountService.getFamilyMemberInfo(cognitoSub);
+  getFamilyMemberInfo = async (req, res) => {
+    try {
+      const cognitoSub = req.user.sub;
 
-            res.status(200).json({
-                success: true,
-                message : 'Account info retrieval successful',
-                result
-            });
-        } catch (err) {
-            res.status(500).json({
-                success: false,
-                error : err.message
-            });
-        }
-    };
+      const result = await accountService.getFamilyMemberInfo(cognitoSub);
 
-    uploadFamilyMemberAccountPic = async (req, res) => {
-        try {
-            const cognitoSub = req.user.sub;
-            const file = req.file;
-            // for debugging
-            console.log('DEBUG: uploadFamilyMemberAccountPic called');
-            console.log('DEBUG: cognitoSub:', cognitoSub);
-            console.log('DEBUG: file received:', file ? {
-                fieldname: file.fieldname,
-                originalname: file.originalname,
-                mimetype: file.mimetype,
-                size: file.size
-            } : 'null');
+      res.status(200).json({
+        success: true,
+        message: "Account info retrieval successful",
+        result,
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        error: err.message,
+      });
+    }
+  };
 
-            if (!file) {
-                console.log('DEBUG: No file found in request');
-                return res.status(400).json({ error: 'No file uploaded' });
+  uploadFamilyMemberAccountPic = async (req, res) => {
+    try {
+      const cognitoSub = req.user.sub;
+      const file = req.file;
+      // for debugging
+      console.log("DEBUG: uploadFamilyMemberAccountPic called");
+      console.log("DEBUG: cognitoSub:", cognitoSub);
+      console.log(
+        "DEBUG: file received:",
+        file
+          ? {
+              fieldname: file.fieldname,
+              originalname: file.originalname,
+              mimetype: file.mimetype,
+              size: file.size,
             }
+          : "null",
+      );
 
-            const result = await accountService.uploadFamilyMemberAccountPic(cognitoSub, file);
-            //for debugging
+      if (!file) {
+        console.log("DEBUG: No file found in request");
+        return res.status(400).json({ error: "No file uploaded" });
+      }
 
-            console.log('DEBUG: upload successful, result:', result);
+      const result = await accountService.uploadFamilyMemberAccountPic(
+        cognitoSub,
+        file,
+      );
+      //for debugging
 
-            res.status(200).json({
-                success: true,
-                message : 'Profile pic upload successful',
-                result
-            });
-        } catch (err) {
-            //for debugging
-            console.error('DEBUG: upload error:', err);
-            res.status(500).json({
-                success: false,
-                error : err.message
-            });
-        }
-    };
+      console.log("DEBUG: upload successful, result:", result);
 
-    updateFamilyMemberInfo = async (req, res) => {
-        try {
-            const cognitoSub = req.user.sub;
-            const parsedFamData = userSchema.safeParse(req.body);
+      res.status(200).json({
+        success: true,
+        message: "Profile pic upload successful",
+        result,
+      });
+    } catch (err) {
+      //for debugging
+      console.error("DEBUG: upload error:", err);
+      res.status(500).json({
+        success: false,
+        error: err.message,
+      });
+    }
+  };
 
-            if (!parsedFamData.success) {
-                return res.status(400).json({
-                    success: false,
-                    error: parsedFamData.error.flatten().fieldErrors
-                });
-            }
+  updateFamilyMemberInfo = async (req, res) => {
+    try {
+      const cognitoSub = req.user.sub;
+      const parsedFamData = userSchema.safeParse(req.body);
 
-            const result = await accountService.updateFamilyMemberInfo({ ...parsedFamData.data, cognitoSub });
+      if (!parsedFamData.success) {
+        return res.status(400).json({
+          success: false,
+          error: parsedFamData.error.flatten().fieldErrors,
+        });
+      }
 
-            res.status(200).json({
-                success: true,
-                message : 'Account info update successful',
-                result
-            });
-        } catch (err) {
-            res.status(500).json({
-                success: false,
-                error : err.message
-            });
-        }
-    };
+      const result = await accountService.updateFamilyMemberInfo({
+        ...parsedFamData.data,
+        cognitoSub,
+      });
 
-    archiveFamilyMemberAccount = async (req, res) => {
-        try {
-            const cognitoSub = req.user.sub;
-            const username = req.user['cognito:username'];
+      res.status(200).json({
+        success: true,
+        message: "Account info update successful",
+        result,
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        error: err.message,
+      });
+    }
+  };
 
-            await accountService.archiveFamilyMemberAccount(cognitoSub, username);
+  archiveFamilyMemberAccount = async (req, res) => {
+    try {
+      const cognitoSub = req.user.sub;
+      const username = req.user["cognito:username"];
 
-            res.status(200).json({
-                success: true,
-                message : 'Account archive successful',
-            });
-        } catch (err) {
-            res.status(500).json({
-                success: false,
-                error : err.message
-            });
-        }
-    }; 
+      await accountService.archiveFamilyMemberAccount(cognitoSub, username);
+
+      res.status(200).json({
+        success: true,
+        message: "Account archive successful",
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        error: err.message,
+      });
+    }
+  };
 }
