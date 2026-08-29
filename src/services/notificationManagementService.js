@@ -55,25 +55,42 @@ export class NotificationManagementService {
             const notificationsToStore = [];
 
             // Checks iot battery level
-            if (iotWearableData.batteryLevel <= LOW_BATTERY_LEVEL) {
-                notificationsToStore.push({
-                    ...baseNotificationData,
-                    linkedNotificationTypeId : NOTIFICATION_TYPES_ID.LOW_BATTERY
-                });
+            if (iotWearableData.batteryLevel !== undefined && iotWearableData.batteryLevel !== null) {
+                const oldBattery = activeIoTWearable.act_battery_level;
+                const newBattery = iotWearableData.batteryLevel;
+                
+                // Only trigger warning if transitioning from normal/unknown to low
+                const wasAboveThreshold = oldBattery === null || oldBattery > LOW_BATTERY_LEVEL;
+                const isBelowThreshold = newBattery <= LOW_BATTERY_LEVEL;
+
+                if (wasAboveThreshold && isBelowThreshold) {
+                    notificationsToStore.push({
+                        ...baseNotificationData,
+                        linkedNotificationTypeId : NOTIFICATION_TYPES_ID.LOW_BATTERY
+                    });
+                }
             }
 
-            // Checks iot status
-            if (iotWearableData.status === 'Online') {
-                notificationsToStore.push({
-                    ...baseNotificationData,
-                    linkedNotificationTypeId : NOTIFICATION_TYPES_ID.CONNECTED
-                });
-            } else {
-                notificationsToStore.push({
-                    ...baseNotificationData,
-                    linkedNotificationTypeId : NOTIFICATION_TYPES_ID.DISCONNECTED
-                });
+            // Checks iot status change
+            if (iotWearableData.status && iotWearableData.status !== activeIoTWearable.act_status) {
+                if (iotWearableData.status === 'Online') {
+                    notificationsToStore.push({
+                        ...baseNotificationData,
+                        linkedNotificationTypeId : NOTIFICATION_TYPES_ID.CONNECTED
+                    });
+                } else if (iotWearableData.status === 'Offline') {
+                    notificationsToStore.push({
+                        ...baseNotificationData,
+                        linkedNotificationTypeId : NOTIFICATION_TYPES_ID.DISCONNECTED
+                    });
+                }
             }
+
+            // Update the active wearable's battery level and status in the DB
+            await activeIoTWearable.update({
+                act_battery_level: iotWearableData.batteryLevel !== undefined ? iotWearableData.batteryLevel : activeIoTWearable.act_battery_level,
+                act_status: iotWearableData.status || activeIoTWearable.act_status,
+            }, { transaction });
 
             const notificationsToSend = [];
 
