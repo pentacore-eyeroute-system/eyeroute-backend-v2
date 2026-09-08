@@ -10,7 +10,7 @@ const iotStateService = new IoTStateService();
 const trackingRouteService = new TrackingRouteService();
 
 export function startIotStatusCron() {
-    // Checks updatedAt column in active iot wearables table every 1 minute real-time
+    // Checks updatedAt column in active iot wearables table every 30 secs real-time
     cron.schedule('*/30 * * * * *', async () => {
         const NOW = new Date();
         const OFFLINE_MINUTES_THRESHOLD = 2 * 60 * 1000; // 2 minutes
