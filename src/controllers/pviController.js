@@ -1,5 +1,5 @@
 import { PviManagementService } from "../services/pviManagementService.js";
-import { pviSchema } from "../validation/pviValidation.js";
+import { pviSchema, pviUpdateSchema } from "../validation/pviValidation.js";
 
 const pviManagementService = new PviManagementService();
 
@@ -110,18 +110,16 @@ export class PviController {
     /*
         Updates selected PVI info and relationship of guardian to them 
     */
-    updatePviInfoAndRelationship = async (req, res) => {
+    updatePviInfo = async (req, res) => {
         try {
             const cognitoSub = req.user.sub;
             const pviId = req.params.id;
             const rawPviData = {
                 pviFirstname: req.body.firstname,
                 pviLastname: req.body.lastname,
-                pviGender: req.body.gender,
-                relationship: req.body.relationship
             };
             
-            const parsedPviData = pviSchema.safeParse(rawPviData);
+            const parsedPviData = pviUpdateSchema.safeParse(rawPviData);
 
             if (!parsedPviData.success) {
                 return res.status(400).json({
@@ -135,11 +133,9 @@ export class PviController {
             const pviData = {
                 firstname: parsedPviData.data.pviFirstname,
                 lastname: parsedPviData.data.pviLastname,
-                gender: parsedPviData.data.pviGender,
-                relationship: parsedPviData.data.relationship
             };
 
-            const result = await pviManagementService.updatePviInfoAndRelationship(cognitoSub, pviId, pviData);
+            const result = await pviManagementService.updatePviInfo(cognitoSub, pviId, pviData);
 
             res.status(200).json({
                 success: true,

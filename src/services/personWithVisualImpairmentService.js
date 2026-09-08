@@ -49,7 +49,6 @@ export class PersonWithVisualImpairmentService {
         await pvi.update({ 
             pvi_first_name  : newPviData.firstname,
             pvi_last_name   : newPviData.lastname,
-            pvi_gender      : newPviData.gender,
         }, { ...options });
 
         return pvi;

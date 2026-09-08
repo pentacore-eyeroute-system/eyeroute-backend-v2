@@ -152,11 +152,11 @@ export class PviManagementService {
         return pvi;
     };
 
-    async updatePviInfoAndRelationship(cognitoSub, pviId, newPviData) {
+    async updatePviInfo(cognitoSub, pviId, newPviData) {
         const transaction = await sequelize.transaction();
 
         try {
-            console.log('Service: updatePviInfoAndRelationship', { cognitoSub, pviId, newPviData });
+            console.log('Service: updatePviInfo', { cognitoSub, pviId, newPviData });
             const familyMember = await familyMemberService.getFamilyMember(cognitoSub);
             
             if (!familyMember) {
@@ -165,15 +165,11 @@ export class PviManagementService {
 
             const updatedPvi = await pviService.updatePviInfo(pviId, newPviData, { transaction });
 
-            const familyPviLink = await familyPviLinkService.updateRelationship(familyMember.id, pviId, newPviData, { transaction });
-
             await transaction.commit();
 
             return {
                 firstName    : updatedPvi.pvi_first_name,
                 lastName     : updatedPvi.pvi_last_name, 
-                gender       : updatedPvi.pvi_gender,
-                relationship : familyPviLink.relative_relationship
             };
         } catch (err) {
             await transaction.rollback();

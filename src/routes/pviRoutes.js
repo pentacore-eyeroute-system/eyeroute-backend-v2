@@ -14,7 +14,7 @@ router.get('/get-linked-apvis-info', authenticateCognitoToken, pviController.get
 router.get('/find-pvi', authenticateCognitoToken, pviController.findPviByPviPublicId);
 
 // PUT route
-router.put('/update-pvi-info/:id', authenticateCognitoToken, pviController.updatePviInfoAndRelationship);
+router.put('/update-pvi-info/:id', authenticateCognitoToken, pviController.updatePviInfo);
 
 // "DELETE route" (archive)
 router.put('/archive-pvi/:id', authenticateCognitoToken, pviController.archivePviAndActiveIoT);
