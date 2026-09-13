@@ -27,7 +27,7 @@ export class IoTWearableService {
             inputType: typeof inputIotActivationCode
         });
 
-        if (iotWearable.wearable_activation_code != inputIotActivationCode) { // Using != to allow type conversion if needed
+        if (iotWearable.wearable_activation_code !== inputIotActivationCode) {
             throw new Error('Invalid device activation code');
         }
 
