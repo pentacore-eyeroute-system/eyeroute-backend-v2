@@ -83,13 +83,27 @@ export class PviManagementService {
     };
 
     async linkUserToExistingPvi(cognitoSub, pviId, relationship) {
+        // Checks if PVI exists
+        const pvi = await pviService.findByPviId(pviId);
+        
+        if (!pvi) {
+            throw new Error('PVI not found');
+        }
+
         const familyMember = await familyMemberService.getFamilyMember(cognitoSub);
 
         if (!familyMember) {
             throw new Error('User not found');
-        }
+        } 
 
         const familyMemberId = familyMember.id;
+
+        // Checks if family member is already linked to the PVI
+        const existingLink = await familyPviLinkService.findByFamIdAndPviId(familyMemberId, pviId);
+        
+        if (existingLink) {
+            throw new Error('User is already linked to this PVI');
+        }
        
         const linkId = await familyPviLinkService.setLink(familyMemberId, pviId, relationship);
 
