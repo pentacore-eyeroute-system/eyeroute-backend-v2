@@ -7,6 +7,16 @@ export class FamilyPviLinkService {
         return pvis;
     };
 
+    async findLink(familyMemberId, pviId) {
+        const link = await FamilyPviLink.findOne({ 
+            where: { 
+                relative_linked_fam_id : familyMemberId, 
+                relative_linked_pvi_id : pviId 
+            } 
+        });
+        return link;
+    };
+
     async setLink(familyMemberId, pviId, relationship, options = {}) { 
         const familyPviLink = await FamilyPviLink.create({
             relative_linked_fam_id : familyMemberId,

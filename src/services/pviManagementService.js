@@ -99,7 +99,7 @@ export class PviManagementService {
         const familyMemberId = familyMember.id;
 
         // Checks if family member is already linked to the PVI
-        const existingLink = await familyPviLinkService.findByFamIdAndPviId(familyMemberId, pviId);
+        const existingLink = await familyPviLinkService.findLink(familyMemberId, pviId);
         
         if (existingLink) {
             throw new Error('User is already linked to this PVI');
