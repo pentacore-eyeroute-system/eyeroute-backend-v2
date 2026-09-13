@@ -11,8 +11,9 @@ export const IoTWearable = sequelize.define(
       unique: true,
     },
     wearable_activation_code: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(20),
       allowNull: false,
+      unique: true
     },
     wearable_activated_at: {
       type: DataTypes.DATE,

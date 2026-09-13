@@ -5,7 +5,10 @@ import { AwsService } from '../services/awsService.js';
 const ioTWearableService = new IoTWearableService();
 const awsService = new AwsService();
 
-export async function massGenerateIotQrCode() {
+export async function massGenerateIotQrCode(options = {}) {
+    // Set forceOverwrite: true to replace/overwrite existing S3 QR codes, or false to skip existing ones
+    const { forceOverwrite = false } = options;
+     
     try {
         // Get all iots
         const iots = await ioTWearableService.getAllIots();
@@ -21,8 +24,10 @@ export async function massGenerateIotQrCode() {
             const serialNumberFileKey = `${folderName}/${currentSerialNumber}-serial.png`;
             const activationCodeFileKey = `${folderName}/${currentSerialNumber}-activation.png`;
 
-            // Checks if serial number qr code exists in aws s3 bucket
-            const serialNumberQrExists = await awsService.iotQrCodeExists(serialNumberFileKey);
+            // Check if serial number qr code exists in aws s3 bucket unless forceOverwrite is true
+            const serialNumberQrExists = forceOverwrite
+                ? false
+                : await awsService.iotQrCodeExists(serialNumberFileKey);
 
             if (!serialNumberQrExists) {
                 // Generates qr code for serial number
@@ -32,8 +37,10 @@ export async function massGenerateIotQrCode() {
                 await awsService.uploadIotQrCode(serialNumberFileKey, qrCodeBuffer, fileMimeType);
             }
 
-            // Checks if activation qr code exists in aws s3 bucket
-            const activationCodeQrExists = await awsService.iotQrCodeExists(activationCodeFileKey);
+            // Check if activation qr code exists in aws s3 bucket unless forceOverwrite is true
+            const activationCodeQrExists = forceOverwrite
+                ? false
+                : await awsService.iotQrCodeExists(activationCodeFileKey);
 
             if (!activationCodeQrExists) {
                 // Generates qr code for activation code
@@ -44,7 +51,7 @@ export async function massGenerateIotQrCode() {
             }
         }
 
-        console.log("Iot QR Generation Success")
+        console.log("Iot QR Generation Success");
     } catch (err) {
         console.log("Iot QR Generation Failed: ", err);
     }
