@@ -8,7 +8,6 @@ import iotStateRoutes from './routes/iotStateRoutes.js';
 import streamRoutes from './routes/streamRoutes.js';
 import newsRoutes from './routes/newsRoutes.js'
 import galleryRoutes from './routes/galleryRoutes.js';
-import authRoutes from './routes/authRoutes.js';
 import routeHistoryRoutes from './routes/routeHistoryRoutes.js';
 // FCM: added for push notification device registration.
 import deviceTokenRoutes from './routes/deviceTokenRoutes.js';
@@ -28,7 +27,6 @@ app.use('/api/iot', iotStateRoutes);
 app.use('/api/stream', streamRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/gallery', galleryRoutes);
-app.use('/api/auth', authRoutes);
 app.use('/api/route-history', routeHistoryRoutes);
 // FCM: added for push notification device registration.
 app.use('/api/device', deviceTokenRoutes);
