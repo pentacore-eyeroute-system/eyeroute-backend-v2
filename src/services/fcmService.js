@@ -37,19 +37,26 @@ function getMessaging() {
     }
 
     try {
-        admin.initializeApp({
-            credential: admin.credential.cert({
-                projectId: FIREBASE_PROJECT_ID,
-                clientEmail: FIREBASE_CLIENT_EMAIL,
-                /*
-                    Env vars cannot hold real newlines, so the private key is
-                    stored with literal "\n" sequences and expanded here.
-                */
-                privateKey: FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-            }),
-        });
+        // 1. Check if 'fcmApp' has already been initialized
+        let fcmApp = admin.apps.find(app => app && app.name === 'fcmApp');
+        
+        if (!fcmApp) {
+            // 2. Initialize a dedicated named app 'fcmApp' specifically for FCM
+            fcmApp = admin.initializeApp({
+                credential: admin.credential.cert({
+                    projectId: FIREBASE_PROJECT_ID,
+                    clientEmail: FIREBASE_CLIENT_EMAIL,
+                    /*
+                        Env vars cannot hold real newlines, so the private key is
+                        stored with literal "\n" sequences and expanded here.
+                    */
+                    privateKey: FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+                }),
+            }, 'fcmApp');
+        }
 
-        messaging = admin.messaging();
+        // 3. Connect FCM messaging explicitly to the 'fcmApp' instance
+        messaging = admin.messaging(fcmApp);
 
         console.log('FCM: initialised for project', FIREBASE_PROJECT_ID);
     } catch (err) {
