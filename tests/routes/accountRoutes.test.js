@@ -4,7 +4,7 @@ import app from '../../src/app.js';
 import { AccountService } from '../../src/services/accountService.js';
 import * as firebaseConfig from '../../src/config/firebase.js';
 
-describe("GET /get-fam-member-info", () => {
+describe("Account Controller & Routes", () => {
     it("should return a json of text data of a user when Firebase JWT is valid", async () => {
         const mockResult = { 
             id                   : 1, 
@@ -51,6 +51,30 @@ describe("GET /get-fam-member-info", () => {
 
         expect(res.body).toEqual({
             message: 'Invalid or expired token'
+        });
+    });
+
+    it("should archive user account successfully with Firebase UID", async () => {
+        const token = 'valid-firebase-jwt-token';
+
+        jest.spyOn(firebaseConfig.firebaseAuth, 'verifyIdToken').mockResolvedValue({
+            uid: 'firebase-user-uid-999',
+            sub: 'firebase-user-uid-999',
+        });
+
+        jest
+            .spyOn(AccountService.prototype, 'archiveFamilyMemberAccount')
+            .mockResolvedValue();
+
+        const res = await request(app)
+            .put("/api/account/archive-fam-member")
+            .set("Authorization", `Bearer ${token}`)
+            .expect("Content-Type", /json/)
+            .expect(200);
+
+        expect(res.body).toEqual({
+            success: true,
+            message: "Account archive successful",
         });
     });
 });

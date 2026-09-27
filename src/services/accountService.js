@@ -3,6 +3,7 @@ import { sequelize } from "../config/db.js";
 import { FamilyMemberService } from "./familyMemberService.js";
 import { FamilyPviLinkService } from "./familyPviLinkService.js";
 import { AwsService } from "./awsService.js";
+import { firebaseAuth } from "../config/firebase.js";
 
 const familyMemberService = new FamilyMemberService();
 const familyPviLinkService = new FamilyPviLinkService();
@@ -88,7 +89,11 @@ export class AccountService {
 
             await familyMemberService.softDeleteFamilyMember(cognitoSub, { transaction });
 
-            await awsService.deleteCognitoUser(username);
+            if (username) {
+                await awsService.deleteCognitoUser(username);
+            } else if (firebaseAuth) {
+                await firebaseAuth.deleteUser(cognitoSub);
+            }
 
             await transaction.commit();
         } catch (err) {

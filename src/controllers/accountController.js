@@ -138,7 +138,7 @@ export class AccountController {
 
   archiveFamilyMemberAccount = async (req, res) => {
     try {
-      const cognitoSub = req.user.sub;
+      const cognitoSub = req.user.uid || req.user.sub;
       const username = req.user["cognito:username"];
 
       await accountService.archiveFamilyMemberAccount(cognitoSub, username);
