@@ -13,10 +13,7 @@ export default {
         password: process.env.MYSQL_PASSWORD,
         database: process.env.MYSQL_DATABASE,
     },
-    cognito: {
-        userPoolId: process.env.COGNITO_USER_POOL_ID,
-        clientId: process.env.COGNITO_CLIENT_ID,
-    },
+
     s3: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,

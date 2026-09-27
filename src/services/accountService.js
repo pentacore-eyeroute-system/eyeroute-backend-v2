@@ -89,9 +89,7 @@ export class AccountService {
 
             await familyMemberService.softDeleteFamilyMember(cognitoSub, { transaction });
 
-            if (username) {
-                await awsService.deleteCognitoUser(username);
-            } else if (firebaseAuth) {
+            if (firebaseAuth) {
                 await firebaseAuth.deleteUser(cognitoSub);
             }
 

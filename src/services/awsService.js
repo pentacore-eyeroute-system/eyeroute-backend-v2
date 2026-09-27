@@ -1,6 +1,5 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { CognitoIdentityProviderClient, AdminCreateUserCommand, AdminDeleteUserCommand, ListUsersCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { v4 as uuidv4 } from 'uuid';
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import config from '../config/env.js';
@@ -9,7 +8,6 @@ const AWS_ACCESS_KEY_ID = config.s3.accessKeyId;
 const AWS_SECRET_ACCESS_KEY = config.s3.secretAccessKey;
 const S3_BUCKET_REGION = config.s3.s3BucketRegion;
 const S3_BUCKET_NAME = config.s3.s3BucketName;
-const COGNITO_USER_POOL_ID = config.cognito.userPoolId;
 const SES_FROM_EMAIL = config.ses.sesFromEmail;
 
 const s3 = new S3Client({
@@ -19,8 +17,6 @@ const s3 = new S3Client({
     },
     region: S3_BUCKET_REGION,
 });
-
-const cognitoClient = new CognitoIdentityProviderClient({ region: S3_BUCKET_REGION });
 
 const sesClient = new SESClient({
     region: S3_BUCKET_REGION
@@ -54,7 +50,7 @@ export class AwsService {
 
         const command = new GetObjectCommand(bucketParameters);
 
-        const url = await getSignedUrl(s3, command, { expiresIn: 604800 }); //indi sha pwede tanggalin. in-extend q na lang for now yung expiration pi.
+        const url = await getSignedUrl(s3, command, { expiresIn: 604800 });
 
         return url;
     };
@@ -84,54 +80,6 @@ export class AwsService {
 
         return url;
     }; 
-
-    async checkEmailExists(email) {
-        const command = new ListUsersCommand({
-            UserPoolId: COGNITO_USER_POOL_ID,
-            Filter: `email = "${email}"`,
-            Limit: 1
-        });
-
-        const result = await cognitoClient.send(command);
-
-        const emailExists = result.Users.length > 0;
-
-        return emailExists;
-    }
-
-    async createCognitoUser(email) {
-        const command = new AdminCreateUserCommand({
-            UserPoolId: COGNITO_USER_POOL_ID,
-            Username: email,
-            MessageAction: 'SUPPRESS',
-            UserAttributes: [
-                {
-                    Name: "email",
-                    Value: email
-                },
-                {
-                    Name: "email_verified",
-                    Value: "true"
-                }
-            ]
-        });
-
-        const result = await cognitoClient.send(command);
-
-        return result.User;
-    };
-
-    /*
-        Permanently deletes Family Member credentials in Cognito by Username (Automatic UUID Generation)
-    */
-    async deleteCognitoUser(username) {
-        const deleteCommand = new AdminDeleteUserCommand({
-            UserPoolId: COGNITO_USER_POOL_ID,
-            Username: username,
-        });
-
-        await cognitoClient.send(deleteCommand);
-    };
 
     async sendEmail(to, subject, body) {
         const command = new SendEmailCommand({
