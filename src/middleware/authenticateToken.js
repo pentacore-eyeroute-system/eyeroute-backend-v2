@@ -1,36 +1,39 @@
-import { CognitoJwtVerifier } from 'aws-jwt-verify';
-import config from '../config/env.js';
+import { firebaseAuth } from '../config/firebase.js';
 
-const COGNITO_USER_POOL_ID = config.cognito.userPoolId;
-const COGNITO_CLIENT_ID = config.cognito.clientId;
-
-const verifier = CognitoJwtVerifier.create({
-    userPoolId: COGNITO_USER_POOL_ID,
-    tokenUse: "id",
-    clientId: COGNITO_CLIENT_ID,
-});
-
-export async function authenticateCognitoToken(req, res, next) {
-    try {       
+export async function authenticateToken(req, res, next) {
+    try {
         const authorizationHeader = req.headers.authorization;
 
         if (!authorizationHeader) return res.status(401).json({ message: 'Missing authorization header' });
 
-        const token = authorizationHeader.split(' ')[1];
+        const tokenParts = authorizationHeader.split(' ');
         
-        const payload = await verifier.verify(token);
+        if (tokenParts.length !== 2 || tokenParts[0] !== 'Bearer') {
+            return res.status(401).json({ message: 'Invalid authorization format' });
+        }
 
-        req.user = payload;
+        const token = tokenParts[1];
+
+        if (!firebaseAuth) {
+            console.error('Firebase Token Verification Failed: Firebase Auth service not initialized');
+            
+            return res.status(500).json({ message: 'Firebase Auth is not initialized' });
+        }
+
+        const decodedToken = await firebaseAuth.verifyIdToken(token);
+
+        req.user = {
+            ...decodedToken,
+            sub: decodedToken.uid,
+            uid: decodedToken.uid, // Standardized sub alias pointing to Firebase UID
+        };
 
         next();
     } catch (err) {
-        console.error('JWT Verification Failed:', err); 
+        console.error('Firebase Token Verification Failed:', err.message);
         return res.status(401).json({ message: 'Invalid or expired token' });
     }
-};
+}
 
-// Log config on startup (safety check)
-console.log('Cognito Middleware Config:', {
-    userPoolId: COGNITO_USER_POOL_ID,
-    clientId: COGNITO_CLIENT_ID ? COGNITO_CLIENT_ID.substring(0, 5) + '...' : 'undefined'
-});
+// Retain exported function name alias for backward compatibility with route definitions
+export const authenticateCognitoToken = authenticateToken;
