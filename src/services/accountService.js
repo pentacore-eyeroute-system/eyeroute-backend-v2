@@ -1,5 +1,4 @@
 import { sequelize } from "../config/db.js";
-
 import { FamilyMemberService } from "./familyMemberService.js";
 import { FamilyPviLinkService } from "./familyPviLinkService.js";
 import { AwsService } from "./awsService.js";
